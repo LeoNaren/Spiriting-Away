@@ -32,7 +32,7 @@ function AskQuestion() {
 
     try {
       const token = await getToken();
-      const response = await fetch("http://localhost:8000/posts", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts`, {
         method: "POST",
         headers: {Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

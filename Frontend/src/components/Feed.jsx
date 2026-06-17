@@ -11,7 +11,7 @@ function FeedCard({ post, user }) {
     async function fetchAnswer() {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/posts/${post.id}/answers`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post.id}/answers`,
         );
         if (response.ok) {
           const fetchedAnswers = await response.json();
@@ -48,7 +48,7 @@ function Feed({ user, recentPosts = [] }) {
   useEffect(() => {
     async function loadposts() {
       try {
-        const response = await fetch("http://127.0.0.1:8000/posts");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts`);
         if (response.ok) {
           const data = await response.json();
           setposts(data);

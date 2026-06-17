@@ -1,3 +1,5 @@
+import os
+import json
 from fastapi import FastAPI, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -13,7 +15,8 @@ from database import get_db
 
 app = FastAPI(title="Spiriting Away Backend")
 
-cred = credentials.Certificate("serviceAccountKey.json")
+service_account_info = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT"))
+cred = credentials.Certificate(service_account_info)
 firebase_admin.initialize_app(cred)
 
 def verify_firebase_token(authorization: str = Header(...)):
@@ -34,6 +37,7 @@ def verify_firebase_token(authorization: str = Header(...)):
 
 
 origins = [
+    "https://spiritingaway.vercel.app/",
     "http://localhost:3000",
     "http://localhost:5173",
     "http://127.0.0.1:3000",

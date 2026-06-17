@@ -26,7 +26,7 @@ function AuthPage() {
         userCredential = await createUserWithEmailAndPassword(auth, email, password)
       }
       const idToken = await userCredential.user.getIdToken()
-      const response = await fetch("http://localhost:8000/user/auth", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/auth`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${idToken}`,
@@ -47,7 +47,7 @@ function AuthPage() {
     try {
       const userCredential = await signInWithPopup(auth, provider)
       const idToken = await userCredential.user.getIdToken()
-      const response = await fetch("http://localhost:8000/user/auth", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/user/auth`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${idToken}`,
