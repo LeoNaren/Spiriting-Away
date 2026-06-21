@@ -1,5 +1,5 @@
 export const AppreciateIcon = ({ className = "w-4 h-4" }) => {
-  <svg className={className}
+  return <svg className={className}
     xmlns="http://www.w3.org/2000/svg"
     width="16"
     height="16"
@@ -15,7 +15,7 @@ export const AppreciateIcon = ({ className = "w-4 h-4" }) => {
 };
 
 export const Feather = ({ className = "w-4 h-4" }) => {
-  <svg className={className}
+  return <svg className={className}
   xmlns="http://www.w3.org/2000/svg" 
   width="16" 
   height="16" 

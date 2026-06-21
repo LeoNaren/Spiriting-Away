@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
+import { AppreciateIcon, Feather } from "./icons.jsx";
 
 // RESPOND BUTTON FUNCTION
 function ReactionButtons({ post_id = null, response_id = null }) {
@@ -125,15 +126,13 @@ function ReactionButtons({ post_id = null, response_id = null }) {
 
       {/* APPRECIATE BUTTON */}
       <div className="appreciate-count">
-        <span>{getAppreciate.data?.count || 0}</span>
-      </div>
-      <div className="appreciate-buttons">
         <button
           onClick={() => appreciateClick.mutate()}
           disabled={appreciateClick.isPending}
         >
-          Appreciate
+          {<AppreciateIcon className="w-4 h-4" />}
         </button>
+        <span>{getAppreciate.data?.count || 0}</span>
       </div>
     </div>
   );

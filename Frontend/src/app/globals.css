@@ -287,7 +287,7 @@ body {
   font-size: 15px;
   color: var(--text-color);
   outline: none;
-  padding-right: 8px 4px;
+  padding: 8px 4px;
 }
 
 .sticky-ask textarea {
@@ -581,6 +581,96 @@ textarea.form-input {
   background-color: var(--surface);
   color: var(--text-muted);
   cursor: not-allowed;
+}
+
+/* =========================================
+   INTERACTION BUTTONS
+========================================= */
+
+.InteractionButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+
+  border-top: 1px solid var(--border-color); /* ADDED: visually separates actions from content */
+}
+
+.response-button {
+  display: flex;
+  align-items: center;
+}
+
+.response-button form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* ADDED: cleaner spacing */
+}
+
+.response-button textarea {
+  min-width: 350px; /* ADDED: prevents tiny textarea */
+}
+
+.appreciate-count {
+  display: flex;
+  align-items: center;
+
+  font-size: 14px;
+  font-weight: 500; /* ADDED: count stands out slightly */
+  color: var(--text-muted);
+}
+
+.appreciate-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.appreciate-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px; /* ADDED: fixed square prevents SVG distortion */
+  height: 36px; /* ADDED: fixed square prevents SVG distortion */
+
+  padding: 0;
+
+  background: transparent;
+  border: 1px solid var(--border-color);
+
+  border-radius: 999px; /* ADDED: circular button */
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.appreciate-buttons button:hover {
+  background: var(--surface); /* ADDED */
+  border-color: var(--border-hover); /* ADDED */
+}
+
+.appreciate-buttons button:active {
+  transform: scale(0.95); /* ADDED: subtle click feedback */
+}
+
+.appreciate-buttons button svg {
+  width: 18px; /* ADDED: force SVG size */
+  height: 18px; /* ADDED: force SVG size */
+  flex-shrink: 0; /* ADDED: prevents flexbox compression */
+}
+
+/* Optional future state when appreciated */
+.appreciate-buttons button.active {
+  background: rgba(139, 105, 20, 0.08); /* ADDED */
+  border-color: var(--primary-color); /* ADDED */
+  color: var(--primary-color); /* ADDED */
 }
 
 /* =========================================

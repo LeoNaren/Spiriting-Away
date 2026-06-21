@@ -196,7 +196,6 @@ def toggle_appreciate(db, user_id, *, post_id=None, response_id=None):
         models.Appreciates.user_id == user_id,
         models.Appreciates.response_id == response_id).delete(synchronize_session=False)
         db.commit()
-        print(f"User {user_id} removed appreciation from {id}")
     else:
         appreciated = True
         new_appreciate = models.Appreciates(
@@ -206,7 +205,6 @@ def toggle_appreciate(db, user_id, *, post_id=None, response_id=None):
         )
         db.add(new_appreciate)
         db.commit()
-        print(f"User {user_id} appreciated post {post_id}")
 
     count_filter = (
     models.Appreciates.post_id == post_id
