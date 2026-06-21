@@ -2,20 +2,26 @@
    1. Color Palette
 ========================================= */
 :root {
-  --bg-color: #f6f7f8;
-  --primary-color: #8b6914;
-  --secondary: #edeff1;
-  --text-color: #1c1c1c;
-  --text-muted: #5f6368;
-  --text-hint: #9aa0a6;
-  --card-bg: #ffffff;
-  --border-color: #dadde1;
-  --border-hover: #aaaeb3;
-  --surface: #f6f7f8;
-  --accent-bg: #f8f9fa;
+  --bg-color: #FAF8F4;
+  --primary-color: #C9A24A;
+  --secondary: #FAF8F4;
+  --text-color: #1F1F1F;
+  --text-muted: #686868;
+  --text-hint: #a19d93;
+  --card-bg: #FFFFFF;
+  --border-color: #e6e1d6;
+  --border-hover: #C9A24A;
+  --surface: #FFFFFF;
+  --accent-bg: #FAF8F4;
 }
 
-h2,
+h1, h2, h3, h4, h5, h6 {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+}
+
 p {
   margin: 0;
   padding: 0;
@@ -249,8 +255,8 @@ body {
   align-items: center;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  padding: 8px 16px;
-  border-radius: 12px;
+  padding: 8px 16px 8px 24px;
+  border-radius: 50px;
   gap: 12px;
 }
 
@@ -284,6 +290,9 @@ body {
   color: var(--text-color);
   outline: none;
   padding: 8px 4px;
+  height: 40px;
+  line-height: 24px;
+  resize: none;
 }
 
 .sticky-ask textarea {
@@ -305,7 +314,7 @@ body {
   color: var(--card-bg);
   border: none;
   padding: 10px 24px;
-  border-radius: 8px;
+  border-radius: 40px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -331,23 +340,25 @@ body {
 .feed-header {
   display: flex;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 50px;
   overflow: hidden;
   margin-bottom: 1rem;
   width: fit-content;
+  background: var(--card-bg);
 }
 
 .feed-tab {
-  padding: 6px 20px;
+  padding: 8px 24px;
   font-size: 13px;
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--text-muted);
+  transition: all 0.2s ease;
 }
 
 .feed-tab.active {
-  background: #e8eaed;
+  background: var(--border-color);
   color: var(--text-color);
   font-weight: 500;
 }
@@ -621,7 +632,7 @@ textarea.form-input {
   align-items: center;
 }
 
-.appreciate-count button {
+.appreciate-buttons button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -644,21 +655,21 @@ textarea.form-input {
   margin-right: 4px;
 }
 
-.appreciate-count button:hover {
+.appreciate-buttons button:hover {
   background: var(--surface);
 }
 
-.appreciate-count button:active {
+.appreciate-buttons button:active {
   transform: scale(0.95);
 }
 
-.appreciate-count button svg {
+.appreciate-buttons button svg {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
 }
 
-.appreciate-count button.active {
+.appreciate-buttons button.active {
   background: rgba(139, 105, 20, 0.08);
   color: var(--primary-color);
 }
