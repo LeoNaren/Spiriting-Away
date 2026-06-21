@@ -171,15 +171,15 @@ body {
 
 .nav-btn {
   background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
+  border: none;
   width: 36px;
   height: 36px;
   font-size: 16px;
   cursor: pointer;
-  color: var(--text-muted);
+  color: var(--text-hint);
   display: flex;
   align-items: center;
+  justify-content: center;
   transition: all 0.15s ease;
 }
 
@@ -190,14 +190,12 @@ body {
 
 .card-badge {
   display: inline-block;
-  font-size: 20px;
-  font-weight: 500;
-  padding: 3px 10px;
-  /* border-radius: 20px; */
-  background: var(--surface);
-  color: var(--text-muted);
-  text-transform: capitalize;
-  letter-spacing: 0.3px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-hint);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
 }
 
 .original-verse {
@@ -215,10 +213,8 @@ body {
   line-height: 1.7;
 }
 
-.nav-btn-more:hover {
-  border-color: var(--border-hover);
+.nav-btn:hover {
   color: var(--text-color);
-  background: var(--surface);
 }
 
 .hero-dots {
@@ -370,28 +366,28 @@ body {
   background: var(--accent-bg);
 }
 
-.feed-question {
-  font-size: 15px;
+.feed-post {
+  font-size: 18px;
   font-weight: 500;
   line-height: 1.45;
   margin-bottom: 0.85rem;
   color: var(--text-color);
+  margin-top: 0;
 }
 
 .top-answer {
-  border-left: 2px solid var(--border-color);
-  padding-left: 0.85rem;
+  padding-left: 1rem;
   margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .answer-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-hint);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  text-transform: capitalize;
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
 .answer-preview {
@@ -524,11 +520,10 @@ body {
 .btn-outline {
   background: transparent;
   color: var(--text-muted);
-  border-color: var(--border-color);
+  border-color: transparent;
 }
 
 .btn-outline:hover {
-  border-color: var(--border-hover);
   color: var(--text-color);
   background: var(--surface);
 }
@@ -592,10 +587,8 @@ textarea.form-input {
   align-items: center;
   gap: 0.75rem;
 
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-
-  border-top: 1px solid var(--border-color); /* ADDED: visually separates actions from content */
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 .response-button {
@@ -628,49 +621,46 @@ textarea.form-input {
   align-items: center;
 }
 
-.appreciate-buttons button {
+.appreciate-count button {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 36px; /* ADDED: fixed square prevents SVG distortion */
-  height: 36px; /* ADDED: fixed square prevents SVG distortion */
+  width: 32px;
+  height: 32px;
 
   padding: 0;
 
   background: transparent;
-  border: 1px solid var(--border-color);
+  border: 1px solid transparent;
 
-  border-radius: 999px; /* ADDED: circular button */
+  border-radius: 50%;
 
   cursor: pointer;
 
   transition:
     background-color 0.2s ease,
-    border-color 0.2s ease,
     transform 0.15s ease;
+  margin-right: 4px;
 }
 
-.appreciate-buttons button:hover {
-  background: var(--surface); /* ADDED */
-  border-color: var(--border-hover); /* ADDED */
+.appreciate-count button:hover {
+  background: var(--surface);
 }
 
-.appreciate-buttons button:active {
-  transform: scale(0.95); /* ADDED: subtle click feedback */
+.appreciate-count button:active {
+  transform: scale(0.95);
 }
 
-.appreciate-buttons button svg {
-  width: 18px; /* ADDED: force SVG size */
-  height: 18px; /* ADDED: force SVG size */
-  flex-shrink: 0; /* ADDED: prevents flexbox compression */
+.appreciate-count button svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
-/* Optional future state when appreciated */
-.appreciate-buttons button.active {
-  background: rgba(139, 105, 20, 0.08); /* ADDED */
-  border-color: var(--primary-color); /* ADDED */
-  color: var(--primary-color); /* ADDED */
+.appreciate-count button.active {
+  background: rgba(139, 105, 20, 0.08);
+  color: var(--primary-color);
 }
 
 /* =========================================

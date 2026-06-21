@@ -1,69 +1,65 @@
 export const ArrowRight = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="20"
+    height="20"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-arrow-right-icon lucide-arrow-right"
+    className="lucide lucide-chevron-right"
   >
-    <path d="M5 12h14" />
-    <path d="m12 5 7 7-7 7" />
+    <path d="m9 18 6-6-6-6" />
   </svg>
 );
 
 export const ArrowLeft = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="20"
+    height="20"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-arrow-left-icon lucide-arrow-left"
+    className="lucide lucide-chevron-left"
   >
-    <path d="m12 19-7-7 7-7" />
-    <path d="M19 12H5" />
+    <path d="m15 18-6-6 6-6" />
   </svg>
 );
 export const ArrowDown = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="20"
+    height="20"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-arrow-down-icon lucide-arrow-down"
+    className="lucide lucide-chevron-down"
   >
-    <path d="M12 5v14" />
-    <path d="m19 12-7 7-7-7" />
+    <path d="m6 9 6 6 6-6" />
   </svg>
 );
 export const ArrowUp = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
+    width="20"
+    height="20"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="lucide lucide-arrow-up-icon lucide-arrow-up"
+    className="lucide lucide-chevron-up"
   >
-    <path d="M12 19V5" />
-    <path d="m5 12 7-7 7 7" />
+    <path d="m18 15-6-6-6 6" />
   </svg>
 );
