@@ -1,7 +1,7 @@
 import os
 import json
 from fastapi import FastAPI, Depends, HTTPException, status, Header
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 import firebase_admin
 from firebase_admin import auth, credentials
@@ -19,6 +19,22 @@ service_account_info = json.loads(os.getenv("FIREBASE_SERVICE_ACCOUNT"))
 cred = credentials.Certificate(service_account_info)
 firebase_admin.initialize_app(cred)
 
+origins = [
+    "https://spiritingaway.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 def verify_firebase_token(authorization: str = Header(...)):
     try:
         if not authorization.startswith("Bearer "):
@@ -34,23 +50,6 @@ def verify_firebase_token(authorization: str = Header(...)):
             status_code=401,
             detail="Invalid Firebase token."
         )
-
-
-origins = [
-    "https://spiritingaway.vercel.app/",
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/posts")
 def get_all_posts(db: Session = Depends(get_db)):
@@ -132,3 +131,140 @@ def authentical_or_register_user(
         print(f"New user registered with fallback username: {user.username}")
     
     return user
+
+@app.get("/posts/{post_id}/responses", response_model=list[schemas.ResponseOut])
+def get_responses(post_id: int, db: Session = Depends(get_db)):
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+
+    if not post:
+        raise HTTPException(
+            status_code=404,
+            detail="Post not found."
+        )
+    
+    responses = (
+        db.query(models.Response).options(joinedload(models.Response.author)).filter(models.Response.post_id == post_id).all()
+    )
+    return responses
+
+@app.post("/posts/{post_id}/responses", response_model=schemas.ResponseOut, status_code=201)
+def create_response(post_id: int, response: schemas.ResponseCreate, db: Session = Depends(get_db),
+                    decoded_token: dict = Depends(verify_firebase_token)):
+    uid = decoded_token["uid"]
+    user = db.query(models.User).filter(models.User.uid == uid).first()
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+
+    if not post:
+        raise HTTPException(
+            status_code=404,
+            detail="Post not found."
+        )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found. Please login first."
+        )
+    
+    new_response = models.Response(
+        post_id=post_id,
+        user_id=user.id,
+        content=response.content
+    )
+    db.add(new_response)
+    db.commit()
+    db.refresh(new_response)
+
+    new_response = (
+    db.query(models.Response)
+    .options(joinedload(models.Response.author))
+    .filter(models.Response.id == new_response.id)
+    .first()
+    )
+    return new_response
+
+def toggle_appreciate(db, user_id, *, post_id=None, response_id=None):
+    existing = db.query(models.Appreciates).filter(
+        models.Appreciates.post_id == post_id,
+        models.Appreciates.user_id == user_id,
+        models.Appreciates.response_id == response_id).first()
+
+    if existing:
+        appreciated = False
+        db.query(models.Appreciates).filter(
+        models.Appreciates.post_id == post_id,
+        models.Appreciates.user_id == user_id,
+        models.Appreciates.response_id == response_id).delete(synchronize_session=False)
+        db.commit()
+        print(f"User {user_id} removed appreciation from {id}")
+    else:
+        appreciated = True
+        new_appreciate = models.Appreciates(
+        post_id=post_id,
+        response_id=response_id,
+        user_id=user_id
+        )
+        db.add(new_appreciate)
+        db.commit()
+        print(f"User {user_id} appreciated post {post_id}")
+
+    count_filter = (
+    models.Appreciates.post_id == post_id
+    if post_id is not None
+    else models.Appreciates.response_id == response_id
+    )
+    count = db.query(models.Appreciates).filter(count_filter).count()
+    return {"appreciated": appreciated, "count": count}
+
+
+@app.get("/posts/{id}/appreciate", response_model=schemas.AppreciateStatus)
+def get_post_appreciate_status(id: int, db: Session = Depends(get_db), decoded_token: dict = Depends(verify_firebase_token)):
+    count = db.query(models.Appreciates).filter(models.Appreciates.post_id == id).count()
+    user_id = db.query(models.User.id).filter(models.User.uid == decoded_token["uid"]).scalar()
+    
+    appreciated = db.query(models.Appreciates).filter(
+        models.Appreciates.post_id == id,
+        models.Appreciates.user_id == user_id
+    ).first() is not None
+    return {"appreciated": appreciated, "count": count}
+
+@app.get("/responses/{id}/appreciate", response_model=schemas.AppreciateStatus)
+def get_response_appreciate_status(id: int, db: Session = Depends(get_db), decoded_token: dict = Depends(verify_firebase_token)):
+    
+    count = db.query(models.Appreciates).filter(models.Appreciates.response_id == id).count()
+    user_id = db.query(models.User.id).filter(models.User.uid == decoded_token["uid"]).scalar()
+    
+    appreciated = db.query(models.Appreciates).filter(
+        models.Appreciates.response_id == id,
+        models.Appreciates.user_id == user_id
+    ).first() is not None
+    return {"appreciated": appreciated, "count": count}
+
+
+@app.post("/posts/{id}/appreciate", response_model=schemas.AppreciateStatus, status_code=201)
+def appreciate_post(id: int, db: Session = Depends(get_db),
+                    decoded_token: dict = Depends(verify_firebase_token)):
+    uid = decoded_token["uid"]
+    user = db.query(models.User).filter(models.User.uid == uid).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found. Please login first."
+        )
+    
+    return toggle_appreciate(db, user.id, post_id=id)
+
+@app.post("/responses/{id}/appreciate", response_model=schemas.AppreciateStatus, status_code=201)
+def appreciate_response(id: int, db: Session = Depends(get_db),
+                       decoded_token: dict = Depends(verify_firebase_token)):
+    uid = decoded_token["uid"]
+    user = db.query(models.User).filter(models.User.uid == uid).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found. Please login first."
+        )
+    
+    return toggle_appreciate(db, user.id, response_id=id)

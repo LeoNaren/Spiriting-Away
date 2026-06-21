@@ -1,6 +1,6 @@
-import "./globals.css"; 
+import "./globals.css";
 import Navbar from "../components/Navbar";
-import { AuthProvider } from "../context/AuthContext";
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "Spiriting Away",
@@ -16,10 +16,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
+        <Providers>
           <Navbar />
           {children}
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -1,55 +1,142 @@
 "use client";
-import {useState, useEffect} from "react";
-import {likeAnswer, ayeAnswer, hasLiked, hasAyed } from "../data/firestore"
+import { useState } from "react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/context/AuthContext";
 
-function ReactionButtons({answer, user}) {
-    const [liked, setLiked] = useState(false);
-    const [ayed, setAyed] = useState(false);
-    const [likeCount, setLikeCount] = useState(answer.likeCount || 0);
-    const [ayeCount, setAyeCount] = useState(answer.ayeCount || 0);
+// RESPOND BUTTON FUNCTION
+function ReactionButtons({ post_id = null, response_id = null }) {
+  const [hidden, setHidden] = useState(true);
+  const [content, setContent] = useState("");
+  const { getToken } = useAuth();
 
-    useEffect(() => {
-        if(!user) return
-        async function checkInteractions() {
-            const [userLiked, userAyed] = await Promise.all([
-                hasLiked(user.uid, answer.id),
-                hasAyed(user.uid, answer.id)
-            ])
-            setLiked(userLiked)
-            setAyed(userAyed)
-        }
-        checkInteractions()
-    }, [user, answer.id])
+  if (!!post_id === !!response_id) {
+    throw new Error("Exactly one of post_id or response_id must be provided");
+  }
 
-    async function handleLike() {
-        if (!user) {
-            alert("Please sign in to react")
-            return
-        }
-        const isNowLiked = await likeAnswer(user.uid, answer.id)
-        setLiked(isNowLiked)
-        setLikeCount(prev => isNowLiked ? prev + 1 : prev - 1)
-    }
+  const queryClient = useQueryClient();
+  const target =
+    post_id !== null ? `posts/${post_id}` : `responses/${response_id}`;
+  const queryKey =
+    post_id !== null ? ["post", post_id] : ["response", response_id];
 
-    async function handleAye() {
-        if (!user) {
-            alert("Please sign in to react")
-            return
-        }
-        const isNowAyed = await ayeAnswer(user.uid, answer.id)
-        setAyed(isNowAyed)
-        setAyeCount(prev => isNowAyed ? prev + 1 : prev - 1)
-    }
+  const invalidate = () => queryClient.invalidateQueries({ queryKey });
 
-    return (
-        <div className="reactions">
-            <button 
-                className={`reaction-btn like-btn ${liked ? "active" : ""}`} 
-                onClick={handleLike}>♥ {likeCount}</button>
-            <button className={`reaction-btn aye-btn ${ayed ? "active" : ""}`} 
-            onClick={handleAye}>✦ {ayeCount}</button>
-        </div>
-    )
+  //GET APPRECIATES
+  const getAppreciate = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${target}/appreciate`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${await getToken()}`,
+          },
+        },
+      );
+      if (!res.ok) throw new Error("Failed to fetch appreciate");
+      return res.json();
+    },
+  });
+
+  // RESPONSE BUTTON FUNCTION
+  const respondClick = useMutation({
+    mutationFn: async (content) => {
+      if (content.trim() === "") {
+        throw new Error("Response content cannot be empty");
+      }
+
+      const token = await getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${target}/responses`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content }),
+        },
+      );
+      if (!response.ok) throw new Error("Failed to submit response");
+      return response.json();
+    },
+    onSuccess: invalidate,
+  });
+
+  // APPRECIATE BUTTON FUNCTION
+  const appreciateClick = useMutation({
+    mutationFn: async () => {
+      const token = await getToken();
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/${target}/appreciate`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (!res.ok) throw new Error("Failed to toggle appreciate");
+      return res.json();
+    },
+    onSuccess: invalidate,
+  });
+
+  // SHARE FUNCTION GOES HERE
+
+  // SAVE FUNCTION GOES HERE
+
+  return (
+    <div className="InteractionButtons">
+      {/* RESPONSE BUTTON */}
+      <div className="response-button">
+        {hidden ? (
+          <button className="btn-outline" onClick={() => setHidden(false)}>
+            Respond
+          </button>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              respondClick.mutate(content);
+            }}
+          >
+            <textarea
+              placeholder="Write your response..."
+              className="form-input"
+              onChange={(e) => setContent(e.target.value)}
+              value={content}
+            ></textarea>
+            <button
+              type="submit"
+              disabled={respondClick.isPending}
+              className="btn-primary"
+            >
+              {respondClick.isPending ? "Submitting..." : "Respond"}
+            </button>
+            <button className="btn-outline" onClick={() => setHidden(true)}>
+              Cancel
+            </button>
+          </form>
+        )}
+      </div>
+
+      {/* APPRECIATE BUTTON */}
+      <div className="appreciate-count">
+        <span>{getAppreciate.data?.count || 0}</span>
+      </div>
+      <div className="appreciate-buttons">
+        <button
+          onClick={() => appreciateClick.mutate()}
+          disabled={appreciateClick.isPending}
+        >
+          Appreciate
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default ReactionButtons;

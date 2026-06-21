@@ -1,0 +1,9 @@
+A simple documentation.
+
+Frontend = Nextjs deployed on vercel
+Backend = Fastapi deployed on Google Cloud run
+Database = PostgreSQL deployed on Neon
+
+CURRENT PROGRESS
+Frontend is okay now. Haven't added respond button to a response.
+Work on Backend.

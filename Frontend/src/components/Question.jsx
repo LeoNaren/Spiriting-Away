@@ -46,8 +46,8 @@ function AskQuestion() {
         setContent("");
       } else {
         const errorData = await response.json();
-    console.error("Backend Error:", errorData);
-    throw new Error("Request failed");
+        console.error("Backend Error:", errorData);
+        throw new Error("Request failed");
       }
     } catch (err) {
       console.error("Network error:", err);

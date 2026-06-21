@@ -2,46 +2,52 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReactionButtons from "./Reactions";
+import { useAuth } from "@/context/AuthContext";
 
-function FeedCard({ post, user }) {
+function FeedCard({ post }) {
   const router = useRouter();
-  const [topAnswer, setTopAnswer] = useState(null);
+  const [topResponse, setTopResponse] = useState(null);
+  const { user, getToken } = useAuth();
 
   useEffect(() => {
-    async function fetchAnswer() {
+    async function fetchResponse() {
+      console.log(process.env.NEXT_PUBLIC_BACKEND_URL)
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post.id}/answers`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post.id}/responses`,
         );
         if (response.ok) {
-          const fetchedAnswers = await response.json();
-          setTopAnswer(fetchedAnswers[0] || null);
+          const fetchedResponses = await response.json();
+          setTopResponse(fetchedResponses[0] || null);
         }
       } catch (error) {
-        console.error("Error fetching top answer:", error);
+        console.error("Error fetching top response:", error);
       }
     }
-    fetchAnswer();
+    fetchResponse();
   }, [post.id]);
 
   return (
     <div
       className="feed-card"
-      onClick={() => router.push(`/post/${post.id}`)}
     >
-      <h3 className="feed-post">{post.content}</h3>
-      {topAnswer && (
+      <h3 className="feed-post"
+      onClick={() => router.push(`/post/${post.id}`)}>
+        {post.content}
+      </h3>
+      <ReactionButtons post_id={post.id} />
+      {topResponse && (
         <div className="top-answer">
-          <span className="answer-label">Top answer</span>
-          <p className="answer-preview">{topAnswer.content}</p>
-          <ReactionButtons answer={topAnswer} user={user} />
+          <span className="answer-label">Top response</span>
+          <p className="answer-preview">{topResponse.content}</p>
+          <ReactionButtons response_id={topResponse.id} />
         </div>
       )}
     </div>
   );
 }
 
-function Feed({ user, recentPosts = [] }) {
+function Feed({ recentPosts = [] }) {
   const [posts, setposts] = useState([]);
   const [activeTab, setActiveTab] = useState("trending");
 
@@ -62,7 +68,7 @@ function Feed({ user, recentPosts = [] }) {
 
   const sortedposts =
     activeTab === "trending"
-      ? [...posts].sort((a, b) => b.answerCount - a.answerCount)
+      ? [...posts].sort((a, b) => b.responseCount - a.responseCount)
       : [...posts].sort((a, b) => {
           const aTime = Date.parse(a.created_at) || 0;
           const bTime = Date.parse(b.created_at) || 0;
@@ -94,10 +100,10 @@ function Feed({ user, recentPosts = [] }) {
 
       {activeTab === "recent"
         ? recentPosts.map((post) => (
-            <FeedCard key={post.id} user={user} post={post} />
+            <FeedCard key={post.id} post={post} />
           ))
         : sortedposts.map((post) => (
-            <FeedCard key={post.id} user={user} post={post} />
+            <FeedCard key={post.id} post={post} />
           ))}
     </div>
   );
