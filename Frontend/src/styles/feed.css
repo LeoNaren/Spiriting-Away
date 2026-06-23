@@ -10,16 +10,20 @@
 
 .feed-card {
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 1px solid #e6e1d6; /* Option 1: Soft borders */
+  /* border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); Option 2: Borderless with subtle shadow */
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 1.75rem 2rem;
   transition:
     transform 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .feed-card:hover {
-  border-color: #d7ccb8;
+  border-color: #c9a24a;
+  /* transform: translateY(-2px); Option 2 hover effect */
+  /* box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); Option 2 hover effect */
 }
 
 .card-top {
@@ -61,16 +65,11 @@
 
 .question-title {
   margin: 0;
-
-  font-family:
-    "Playfair Display",
-    "Lora",
-    serif;
-
-  font-size: 1.8rem;
+  font-family: "Georgia", "Playfair Display", "Lora", serif;
+  font-size: 1.5rem;
   font-weight: 500;
-  line-height: 1.35;
-  color: var(--text);
+  line-height: 1.4;
+  color: var(--text-primary, #1f1f1f);
 }
 
 /* Placeholder if title missing */
@@ -117,9 +116,7 @@
 .reflection-content {
   margin: 0;
 
-  font-family:
-    "Lora",
-    serif;
+  font-family: "Lora", serif;
 
   font-size: 1.05rem;
   line-height: 1.8;
@@ -191,11 +188,24 @@
 
 @media (max-width: 768px) {
   .feed-card {
-    padding: 1.2rem;
+    background: var(--surface);
+    border: 1px solid #e6e1d6; /* Option 1: Soft borders */
+    /* border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); Option 2: Borderless with subtle shadow */
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .question-title {
-    font-size: 1.45rem;
+    margin: 0;
+    font-family: "Georgia", "Playfair Display", "Lora", serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text-primary, #1f1f1f);
   }
 
   .reflection-content {

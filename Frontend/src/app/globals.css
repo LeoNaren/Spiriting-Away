@@ -202,17 +202,17 @@ body {
 
 .original-verse {
   font-family: Georgia, serif;
-  font-size: 20px;
+  font-size: 1.25rem; /* Scaled down from 20px (approx 1.25rem) to ensure it sits quietly */
   font-weight: 400;
-  line-height: 1.6;
-  margin-bottom: 0.85rem;
+  line-height: 1.45;
+  margin-bottom: 0.5rem;
   color: var(--text-color);
 }
 
 .translation {
-  font-size: 14px;
+  font-size: 13px; /* Scaled down from 14px */
   color: var(--text-muted);
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 .nav-btn-more:hover {
@@ -334,44 +334,62 @@ body {
 ========================================= */
 .feed-header {
   display: flex;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 1rem;
-  width: fit-content;
+  gap: 1rem;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .feed-tab {
-  padding: 6px 20px;
-  font-size: 13px;
+  padding: 6px 12px;
+  font-size: 14px;
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--text-muted);
+  position: relative;
+  transition: color 0.2s ease;
 }
 
 .feed-tab.active {
-  background: #e8eaed;
+  background: transparent;
   color: var(--text-color);
-  font-weight: 500;
+  font-weight: 600;
+}
+.feed-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--text-color);
+  border-radius: 2px;
 }
 
 .feed-card {
-  border: 1px solid var(--border-color);
+  border: 1px solid #e6e1d6; /* Option 1: Soft borders */
+  /* border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); Option 2: Borderless with subtle shadow */
   border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+  padding: 1.75rem 2rem;
   margin-bottom: 0.75rem;
   background: var(--card-bg);
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .feed-card:hover {
-  border-color: var(--border-hover);
-  background: var(--accent-bg);
+  border-color: #c9a24a; /* Accent Gold */
+  /* transform: translateY(-2px); Option 2 hover effect */
+  /* box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); Option 2 hover effect */
+  background: var(--card-bg);
 }
 
 .feed-question {
-  font-size: 15px;
+  font-family: Georgia, serif;
+  font-size: 1.4rem;
   font-weight: 500;
   line-height: 1.45;
   margin-bottom: 0.85rem;
@@ -379,9 +397,10 @@ body {
 }
 
 .top-answer {
-  border-left: 2px solid var(--border-color);
-  padding-left: 0.85rem;
+  border-left: 2px solid #e6e1d6;
+  padding-left: 1.25rem;
   margin-bottom: 1rem;
+  margin-top: 1.5rem;
 }
 
 .answer-label {
@@ -391,13 +410,13 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
 .answer-preview {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-muted);
-  line-height: 1.6;
+  line-height: 1.7;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   line-clamp: 3;
@@ -412,24 +431,27 @@ body {
 }
 
 .reaction-btn {
-  font-size: 12px;
-  padding: 5px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
   background: transparent;
   cursor: pointer;
   color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.2s ease;
 }
 
 .reaction-btn.active {
-  background: var(--text-color);
-  color: var(--card-bg);
-  border-color: var(--text-color);
+  background: transparent;
+  color: #c9a24a;
 }
 
 .reaction-btn:hover:not(.active) {
-  background: var(--surface);
-  color: var(--text-color);
+  background: transparent;
+  color: #c9a24a;
 }
 
 /* =========================================
@@ -524,13 +546,14 @@ body {
 .btn-outline {
   background: transparent;
   color: var(--text-muted);
-  border-color: var(--border-color);
+  border: none;
+  padding: 8px 12px;
 }
 
 .btn-outline:hover {
-  border-color: var(--border-hover);
-  color: var(--text-color);
-  background: var(--surface);
+  border-color: transparent;
+  color: #c9a24a;
+  background: transparent;
 }
 
 /* For primary actions like "Submit" */
@@ -632,28 +655,23 @@ textarea.form-input {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 36px; /* ADDED: fixed square prevents SVG distortion */
-  height: 36px; /* ADDED: fixed square prevents SVG distortion */
-
+  width: 36px;
+  height: 36px;
   padding: 0;
-
   background: transparent;
-  border: 1px solid var(--border-color);
-
-  border-radius: 999px; /* ADDED: circular button */
-
+  border: none; /* Removed heavy border */
+  border-radius: 50%;
   cursor: pointer;
-
+  color: var(--text-muted); /* Default quiet color */
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
+    color 0.2s ease,
     transform 0.15s ease;
 }
 
 .appreciate-buttons button:hover {
-  background: var(--surface); /* ADDED */
-  border-color: var(--border-hover); /* ADDED */
+  background: transparent;
+  border-color: transparent;
+  color: #c9a24a; /* Accent Gold on hover */
 }
 
 .appreciate-buttons button:active {
@@ -668,9 +686,9 @@ textarea.form-input {
 
 /* Optional future state when appreciated */
 .appreciate-buttons button.active {
-  background: rgba(139, 105, 20, 0.08); /* ADDED */
-  border-color: var(--primary-color); /* ADDED */
-  color: var(--primary-color); /* ADDED */
+  background: transparent;
+  border-color: transparent;
+  color: #c9a24a;
 }
 
 /* =========================================
@@ -720,7 +738,12 @@ textarea.form-input {
   }
 
   .original-verse {
-    font-size: 16px;
+    font-family: Georgia, serif;
+    font-size: 1.25rem; /* Scaled down from 20px (approx 1.25rem) to ensure it sits quietly */
+    font-weight: 400;
+    line-height: 1.45;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
   }
 
   .question-section.stuck {
