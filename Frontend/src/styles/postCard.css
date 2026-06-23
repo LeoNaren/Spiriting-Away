@@ -1,20 +1,14 @@
 .post-card {
   background: var(--surface);
-
   border: 1px solid var(--border);
-
   border-radius: var(--radius-lg);
-
   padding: 1.75rem;
-
   margin-bottom: 1.5rem;
-
   transition: 0.25s ease;
 }
 
 .post-card:hover {
   transform: translateY(-2px);
-
   box-shadow: var(--shadow);
 }
 
@@ -26,56 +20,49 @@
 .post-avatar {
   width: 48px;
   height: 48px;
-
   border-radius: 50%;
-
   background: #f0ece4;
 }
 
 .post-title {
-  font-size: 1.9rem;
-
+  font-size: 1.6rem;
   margin-bottom: 0.25rem;
-
-  font-family: "Playfair Display", serif;
+  font-family: "Georgia", "Playfair Display", serif;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .post-meta {
-  color: var(--text-muted);
-
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: -0.25rem;
 }
 
 .post-actions {
   display: flex;
-
   gap: 2rem;
-
   margin-top: 1rem;
-
   color: var(--text-secondary);
 }
 
 .post-divider {
   margin: 1.5rem 0;
-
   border: none;
-
   border-top: 1px solid var(--border);
 }
 
 .top-reflection-label {
   color: var(--accent);
-
-  font-size: 0.9rem;
-
+  font-size: 0.75rem;
   margin-bottom: 0.75rem;
-
   font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .top-reflection-text {
-  font-size: 1.15rem;
-
-  line-height: 1.8;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-family: "Inter", "Source Sans 3", sans-serif;
+  color: var(--text-secondary);
 }

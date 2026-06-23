@@ -27,7 +27,7 @@
 }
 
 .card-top {
-  margin-bottom: 0.9rem;
+
 }
 
 /* =========================
@@ -103,7 +103,7 @@
 .top-reflection {
   display: inline-block;
 
-  margin-bottom: 0.9rem;
+
 
   font-size: 0.82rem;
   font-weight: 600;
@@ -211,4 +211,93 @@
   .reflection-content {
     font-size: 1rem;
   }
+}
+
+/* =========================
+   FEED TABS
+========================= */
+
+.feed-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.feed-tab {
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.feed-tab:hover {
+  color: var(--text-primary);
+}
+
+.feed-tab.active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* =========================
+   FEED POST TYPOGRAPHY
+========================= */
+
+.feed-post {
+  font-family: "Georgia", "Playfair Display", "Lora", serif;
+  font-size: 1.6rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-primary);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.top-answer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.answer-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.answer-preview {
+  font-family: "Inter", "Source Sans 3", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* Additional overrides for FeedCard specific structure */
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+}
+
+.card-top::after {
+  content: "Asked by user";
+  font-size: 0.85rem;
+  color: var(--text-secondary);
 }
