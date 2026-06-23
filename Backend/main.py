@@ -51,9 +51,24 @@ def verify_firebase_token(authorization: str = Header(...)):
             detail="Invalid Firebase token."
         )
 
+@app.get("/user")
+def get_user(user_id, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found for the provided ID by the post."
+        )
+    return user
+
 @app.get("/posts")
-def get_all_posts(db: Session = Depends(get_db)):
-    posts = db.query(models.Post).all()
+def get_posts(
+    sort: str = "new",
+    skip:int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db)):
+    posts = db.query(models.Post).order_by(models.Post.created_at.desc()).offset(skip).limit(limit).all()
+    # Sorting Algorithm based on the 'sort' parameter
     return posts
 
 @app.post("/posts")
@@ -146,6 +161,42 @@ def get_responses(post_id: int, db: Session = Depends(get_db)):
         db.query(models.Response).options(joinedload(models.Response.author)).filter(models.Response.post_id == post_id).all()
     )
     return responses
+
+@app.post("/responses/{response_id}/responses", response_model=schemas.ResponseOut, status_code=201)
+def create_response_to_response(response_id: int, response: schemas.ResponseCreate, db: Session = Depends(get_db),
+                                decoded_token: dict = Depends(verify_firebase_token)):
+    uid = decoded_token["uid"]
+    user = db.query(models.User).filter(models.User.uid == uid).first()
+    parent_response = db.query(models.Response).filter(models.Response.id == response_id).first()
+
+    if not parent_response:
+        raise HTTPException(
+            status_code=404,
+            detail="Parent response not found."
+        )
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found. Please login first."
+        )
+
+    new_response = models.Response(
+        post_id=parent_response.post_id,
+        user_id=user.id,
+        content=response.content
+    )
+    db.add(new_response)
+    db.commit()
+    db.refresh(new_response)
+
+    new_response = (
+        db.query(models.Response)
+        .options(joinedload(models.Response.author))
+        .filter(models.Response.id == new_response.id)
+        .first()
+    )
+    return new_response
 
 @app.post("/posts/{post_id}/responses", response_model=schemas.ResponseOut, status_code=201)
 def create_response(post_id: int, response: schemas.ResponseCreate, db: Session = Depends(get_db),

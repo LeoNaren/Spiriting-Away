@@ -1,0 +1,115 @@
+.ask-container {
+  margin: 2rem 0;
+
+  padding: 1.25rem 1.5rem;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    padding 0.2s ease;
+}
+
+.ask-container:hover {
+  box-shadow: var(--shadow);
+}
+
+.ask-heading {
+  font-family: "Playfair Display", serif;
+
+  font-family: "Playfair Display", serif;
+
+  font-size: 1.35rem;
+
+  margin-bottom: 0.75rem;
+}
+
+.ask-input {
+  width: 100%;
+
+  min-height: 72px;
+  max-height: 96px;
+
+  padding: 1rem;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  background: var(--bg);
+
+  resize: none;
+
+  font-size: 1rem;
+
+  outline: none;
+
+  transition: border-color 0.2s ease;
+}
+
+.ask-input:focus {
+  border-color: var(--accent);
+}
+
+.ask-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: 0.75rem;
+}
+
+.ask-btn {
+  padding: 0.65rem 1.25rem;
+
+  border-radius: 10px;
+
+  border: none;
+
+  background: #1f1f1f;
+  color: white;
+}
+
+.ask-btn:hover {
+  transform: translateY(-1px);
+}
+
+.ask-container.sticky {
+  position: sticky;
+
+  top: 72px;
+
+  z-index: 90;
+
+  padding: 0.75rem;
+
+  margin: 0 0 1rem;
+
+  border-radius: 12px;
+
+  box-shadow: var(--shadow);
+}
+
+.ask-container.sticky .ask-heading,
+.ask-container.sticky .ask-subheading {
+  display: none;
+}
+
+.ask-container.sticky .ask-form {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.75rem;
+}
+
+.ask-container.sticky .ask-input {
+  min-height: 44px;
+  max-height: 44px;
+}
+
+.ask-container.sticky .ask-actions {
+  margin: 0;
+}

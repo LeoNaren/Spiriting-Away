@@ -1,8 +1,9 @@
 "use client";
+import "@/styles/reactions.css";
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
-import { AppreciateIcon, Feather } from "./icons.jsx";
+import { AppreciateIcon, RespondIcon } from "./icons.jsx";
 
 // RESPOND BUTTON FUNCTION
 function ReactionButtons({ post_id = null, response_id = null }) {
@@ -90,26 +91,43 @@ function ReactionButtons({ post_id = null, response_id = null }) {
   // SAVE FUNCTION GOES HERE
 
   return (
-    <div className="InteractionButtons">
-      {/* RESPONSE BUTTON */}
-      <div className="response-button">
-        {hidden ? (
-          <button className="btn-outline" onClick={() => setHidden(false)}>
-            Respond
+    <>
+      <div className="InteractionButtons">
+        <div className="interaction-left">
+          <div className="appreciate-count">
+            <button
+              onClick={() => appreciateClick.mutate()}
+              disabled={appreciateClick.isPending}
+              className="interaction-icon"
+            >
+              <AppreciateIcon />
+            </button>
+
+            <span>{getAppreciate.data?.count || 0}</span>
+          </div>
+
+          <button className="interaction-icon" onClick={() => setHidden(false)}>
+            <RespondIcon />
           </button>
-        ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              respondClick.mutate(content);
-            }}
-          >
-            <textarea
-              placeholder="Write your response..."
-              className="form-input"
-              onChange={(e) => setContent(e.target.value)}
-              value={content}
-            ></textarea>
+        </div>
+      </div>
+
+      {!hidden && (
+        <form
+          className="response-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            respondClick.mutate(content);
+          }}
+        >
+          <textarea
+            placeholder="Share your reflection..."
+            className="form-input"
+            onChange={(e) => setContent(e.target.value)}
+            value={content}
+          />
+
+          <div className="response-actions">
             <button
               type="submit"
               disabled={respondClick.isPending}
@@ -117,25 +135,18 @@ function ReactionButtons({ post_id = null, response_id = null }) {
             >
               {respondClick.isPending ? "Submitting..." : "Respond"}
             </button>
-            <button className="btn-outline" onClick={() => setHidden(true)}>
+
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={() => setHidden(true)}
+            >
               Cancel
             </button>
-          </form>
-        )}
-      </div>
-
-      {/* APPRECIATE BUTTON */}
-      <div className="appreciate-count">
-        <button
-          onClick={() => appreciateClick.mutate()}
-          disabled={appreciateClick.isPending}
-        >
-          {<AppreciateIcon className="w-4 h-4" />}
-        </button>
-        <span>{getAppreciate.data?.count || 0}</span>
-      </div>
-    </div>
+          </div>
+        </form>
+      )}
+    </>
   );
 }
-
 export default ReactionButtons;

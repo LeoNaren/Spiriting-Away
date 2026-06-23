@@ -1,0 +1,99 @@
+.navbar {
+  background: rgba(250, 248, 244, 0.95);
+
+  border-bottom: 1px solid var(--border);
+
+  position: sticky;
+  top: 0;
+
+  z-index: 100;
+}
+
+.navbar-container {
+  max-width: var(--content-width);
+
+  margin: 0 auto;
+
+  height: 72px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 2rem;
+}
+
+.site-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.75rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-link {
+  position: relative;
+  color: var(--text-secondary);
+}
+
+.nav-link.active {
+  color: var(--text-primary);
+}
+
+.nav-link.active::after {
+  content: "";
+
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
+
+  background: var(--accent);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  cursor: pointer;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.nav-username {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.nav-signout,
+.nav-signin {
+  color: var(--text-primary);
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.nav-signout:hover,
+.nav-signin:hover {
+  color: var(--accent);
+}
+
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text-primary);
+}
+
+.hamburger {
+  display: none;
+}

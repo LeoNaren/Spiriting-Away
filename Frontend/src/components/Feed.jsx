@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import ReactionButtons from "./Reactions";
 import { useAuth } from "@/context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
 
 function FeedCard({ post }) {
   const router = useRouter();
@@ -28,9 +29,12 @@ function FeedCard({ post }) {
   }, [post.id]);
 
   return (
-    <div
-      className="feed-card"
-    >
+    <div className="feed-card">
+      <div className="card-top">
+        <div className="avatar">
+          {}
+        </div>
+      </div>
       <h3 className="feed-post"
       onClick={() => router.push(`/post/${post.id}`)}>
         {post.content}

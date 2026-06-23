@@ -1,0 +1,111 @@
+.InteractionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.interaction-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.appreciate-count {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.interaction-icon {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #777;
+  transition: 0.2s;
+}
+
+.interaction-icon:hover {
+  color: #c9a24a;
+}
+
+.appreciate-count span {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.response-trigger {
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  font-size: 0.95rem;
+  color: #666;
+
+  transition: 0.2s;
+}
+
+.response-trigger:hover {
+  color: #c9a24a;
+}
+
+.response-form {
+  margin-top: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form-input {
+  min-height: 100px;
+
+  resize: vertical;
+
+  padding: 0.9rem 1rem;
+
+  border: 1px solid #e6e1d6;
+  border-radius: 12px;
+
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #c9a24a;
+}
+
+.response-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-primary {
+  border: none;
+  border-radius: 10px;
+
+  background: #1f1f1f;
+  color: white;
+
+  padding: 0.7rem 1.2rem;
+
+  cursor: pointer;
+}
+
+.btn-outline {
+  border: 1px solid #e6e1d6;
+  border-radius: 10px;
+
+  background: white;
+  color: #666;
+
+  padding: 0.7rem 1.2rem;
+
+  cursor: pointer;
+}

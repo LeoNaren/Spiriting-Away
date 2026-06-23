@@ -1,0 +1,204 @@
+.feed-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.feed-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.feed-card:hover {
+  border-color: #d7ccb8;
+}
+
+.card-top {
+  margin-bottom: 0.9rem;
+}
+
+/* =========================
+   USER
+========================= */
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f4efe6;
+  border: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+
+  overflow: hidden;
+  text-transform: uppercase;
+}
+
+/* =========================
+   QUESTION
+========================= */
+
+.question-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.question-title {
+  margin: 0;
+
+  font-family:
+    "Playfair Display",
+    "Lora",
+    serif;
+
+  font-size: 1.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+/* Placeholder if title missing */
+
+.question-title:empty::before {
+  content: "Untitled Question";
+  color: var(--muted);
+}
+
+.question-meta {
+  margin: 0;
+
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.question-actions {
+  margin-top: 0.35rem;
+}
+
+/* =========================
+   TOP RESPONSE
+========================= */
+
+.card-divider {
+  margin-top: 1.4rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+}
+
+.top-reflection {
+  display: inline-block;
+
+  margin-bottom: 0.9rem;
+
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  color: var(--accent);
+}
+
+.reflection-content {
+  margin: 0;
+
+  font-family:
+    "Lora",
+    serif;
+
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+/* Placeholder if response missing */
+
+.reflection-content:empty::before {
+  content: "No reflections yet.";
+  color: var(--muted);
+  font-style: italic;
+}
+
+.reflection-actions {
+  margin-top: 1rem;
+}
+
+/* =========================
+   REACTION BUTTON AREA
+========================= */
+
+.question-actions,
+.reflection-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Works nicely regardless of how
+   ReactionButtons is structured */
+
+.question-actions button,
+.reflection-actions button {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+}
+
+.question-actions button:hover,
+.reflection-actions button:hover {
+  color: var(--accent);
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.feed-container:empty::before {
+  content: "Questions will appear here.";
+  display: block;
+
+  padding: 3rem;
+  text-align: center;
+
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+
+  color: var(--muted);
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  .feed-card {
+    padding: 1.2rem;
+  }
+
+  .question-title {
+    font-size: 1.45rem;
+  }
+
+  .reflection-content {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,33 @@
+.recently-asked {
+  padding-left: 1rem;
+}
+
+.sidebar-title {
+  font-family: "Playfair Display", serif;
+
+  font-size: 1.4rem;
+
+  margin-bottom: 1.5rem;
+}
+
+.recent-item {
+  padding: 1rem 0;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.recent-question {
+  margin-bottom: 0.4rem;
+
+  transition: 0.2s;
+}
+
+.recent-question:hover {
+  color: var(--accent);
+}
+
+.recent-time {
+  color: var(--text-muted);
+
+  font-size: 0.85rem;
+}

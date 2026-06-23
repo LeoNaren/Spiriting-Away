@@ -1,0 +1,58 @@
+@media (max-width: 960px) {
+
+  .page-body {
+    grid-template-columns: 1fr;
+  }
+
+  .side-column {
+    display: none;
+  }
+
+  .wisdom-sanskrit {
+    font-size: 2rem;
+  }
+
+  .post-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+
+  .page-body {
+    padding: 1.5rem;
+  }
+
+  .navbar-container {
+    padding: 0 1rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .nav-links,
+  .nav-user {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+
+    flex-direction: column;
+    gap: 4px;
+
+    background: transparent;
+    border: none;
+  }
+
+  .hamburger span {
+    width: 22px;
+    height: 2px;
+
+    background: var(--text-primary);
+  }
+}

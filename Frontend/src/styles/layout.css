@@ -1,0 +1,19 @@
+.page-body {
+  max-width: var(--content-width);
+
+  margin: 0 auto;
+
+  padding: 3rem 2rem;
+
+  display: grid;
+  grid-template-columns: 1fr 320px;
+
+  gap: 3rem;
+}
+
+.side-column {
+  position: sticky;
+  top: 100px;
+
+  height: fit-content;
+}

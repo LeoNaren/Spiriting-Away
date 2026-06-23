@@ -1,5 +1,6 @@
 "use client";
-import { act, useRef, useState } from "react";
+import "@/styles/wisdom.css";
+import { useRef, useState } from "react";
 import { verses, facts, events } from "../data";
 import * as Arrows from "@/data/icons";
 
@@ -55,8 +56,8 @@ function WisdomDoc() {
 
   function handleTouchEnd(e) {
     if (!touchStartX.current) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX
-    if(diff > 0) handleNext();
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (diff > 0) handleNext();
     else handlePrev();
     touchStartX.current = null;
   }
@@ -64,28 +65,40 @@ function WisdomDoc() {
   const card = cards[activeType];
 
   return (
-    <div className="hero-stack">
-      <button className="nav-btn-prev nav-btn" onClick={handlePrev}>
-        <Arrows.ArrowLeft />
-      </button>
-      <div className="stack-card" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <section className="hero-stack">
+      <div
+        className="wisdom-quote"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <span className="card-badge">{card.badge}</span>
         <h3 className="original-verse">{card.title}</h3>
+
         <p className="translation">{card.body}</p>
       </div>
-      <button className="nav-btn-next nav-btn" onClick={handleNext}>
-        <Arrows.ArrowRight />
-      </button>
-      <button className="nav-btn-more nav-btn" onClick={handleMore}>
-        <Arrows.ArrowDown />
-      </button>
 
       <div className="hero-dots">
         {cards.map((_, i) => (
-          <span key={i} className={`hero-dot ${i === activeType ? "active" : ""}`} />
+          <span
+            key={i}
+            className={`hero-dot ${i === activeType ? "active" : ""}`}
+          />
         ))}
       </div>
-    </div>
+
+      <div className="hero-controls">
+        <button className="nav-btn" onClick={handlePrev}>
+          <Arrows.ArrowLeft />
+        </button>
+
+        <button className="nav-btn" onClick={handleMore}>
+          <Arrows.ArrowDown />
+        </button>
+        <button className="nav-btn" onClick={handleNext}>
+          <Arrows.ArrowRight />
+        </button>
+      </div>
+    </section>
   );
 }
 

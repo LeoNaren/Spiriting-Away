@@ -1,4 +1,5 @@
 "use client";
+import "@/styles/sidebar.css";
 import { useState, useEffect } from "react";
 import { listenToQuestions } from "../data/firestore";
 import { useRouter } from "next/navigation";

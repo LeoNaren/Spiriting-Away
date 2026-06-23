@@ -1,4 +1,5 @@
 "use client";
+import "@/styles/navbar.css";
 import Link from "next/link";
 import Image from "next/image";
 import { auth } from "../data/firebase";
@@ -11,47 +12,71 @@ function Navbar() {
   const { user } = useAuth();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-
   return (
     <div className="navbar">
-      <Image className="navbar-logo" src="/spiriting-away.png" alt="Logo" height={50} width={50} />
+      <div className="navbar-container">
+        <div className="logo-section" onClick={() => router.push("/")}>
+          <Image src="/spiriting-away.png" alt="Logo" width={42} height={42} />
 
-      <h1
-        className="navbar-title"
-        onClick={() => router.push("/")}
-        style={{ cursor: "pointer" }}
-      >
-        Spiriting Away
-      </h1>
+          <h1 className="site-title">Spiriting Away</h1>
+        </div>
 
-      <div className="nav-links">
-        {user ? (
-          <>
-            <span className="nav-username">
-              {user.displayName || user.email}
-            </span>
-            <span className="nav-signout" onClick={() => signOut(auth)}>
-              Sign out
-            </span>
-          </>
-        ) : (
-          <Link href="/auth">Sign In</Link>
-        )}
+        <div className="nav-links">
+          <Link className="nav-link" href="/">
+            Questions
+          </Link>
+        </div>
+
+        <div className="nav-user">
+          {user ? (
+            <>
+              <span className="nav-username">
+                {user.displayName || user.email}
+              </span>
+
+              <span className="nav-signout" onClick={() => signOut(auth)}>
+                Sign out
+              </span>
+            </>
+          ) : (
+            <Link className="nav-signin" href="/auth">
+              Sign In
+            </Link>
+          )}
+        </div>
+
+        <button
+          className={`hamburger ${menuOpen ? "active" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
       </div>
-
-      <button className={`hamburger ${menuOpen ? "active" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
-        <span /><span /><span />
-      </button>
 
       {menuOpen && (
         <div className="mobile-menu">
           {user ? (
             <>
-            <span className="nav-username">{user.displayName || user.email}</span>
-            <span className="nav-signout" onClick={() => { signOut(auth); setMenuOpen(false); }}>
-              Sign out</span>
+              <span className="nav-username">
+                {user.displayName || user.email}
+              </span>
+
+              <span
+                className="nav-signout"
+                onClick={() => {
+                  signOut(auth);
+                  setMenuOpen(false);
+                }}
+              >
+                Sign out
+              </span>
             </>
-          ) : (<Link href="/auth" onClick={() => setMenuOpen(false)}>Sign In</Link>
+          ) : (
+            <Link href="/auth" onClick={() => setMenuOpen(false)}>
+              Sign In
+            </Link>
           )}
         </div>
       )}

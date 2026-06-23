@@ -1,9 +1,9 @@
 "use client";
+import "@/styles/askQuestions.css";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 
-
-function AskQuestion() {
+function AskQuestion({onSuccess}) {
   const { user, getToken } = useAuth();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,18 +32,23 @@ function AskQuestion() {
 
     try {
       const token = await getToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts`, {
-        method: "POST",
-        headers: {Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            content: content,
+          }),
         },
-        body: JSON.stringify({
-          content: content,
-        }),
-      });
+      );
 
       if (response.ok) {
         setContent("");
+        onSuccess?.();
       } else {
         const errorData = await response.json();
         console.error("Backend Error:", errorData);
@@ -54,29 +59,30 @@ function AskQuestion() {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   return (
-    <>
-      <div ref={askRef} style={{ height: "1px", marginBottom: "-1px" }} />
-      <form className={`question-section ${isSticky ? "stuck" : "original"}`}>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Ask a question..."
-            rows={3}
-            disabled={isSubmitting}
-          />
+    <section className={`ask-container ${isSticky ? "sticky" : ""}`}>
+      <form className="ask-form">
+        <input
+          className="ask-input"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder="Ask a question..."
+          disabled={isSubmitting}
+        />
+        <div className="ask-actions">
           <button
             type="submit"
             className="submit-button"
             disabled={isSubmitting || !content.trim()}
             onClick={handleSubmit} // Need to update so that it refereshes the right feed to show the new question
-            >
+          >
             {isSubmitting ? "Posting..." : "Submit"}
           </button>
+        </div>
       </form>
-    </>
+    </section>
   );
 }
 
