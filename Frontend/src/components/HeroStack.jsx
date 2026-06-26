@@ -2,7 +2,7 @@
 import "@/styles/wisdom.css";
 import { useRef, useState } from "react";
 import { verses, facts, events } from "../data";
-import * as Arrows from "@/data/icons";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 
 function getNext(arr, currentID) {
   const next = arr[Math.floor(Math.random() * arr.length)];
@@ -66,6 +66,10 @@ function WisdomDoc() {
 
   return (
     <section className="hero-stack">
+      <button className="hero-chevron hero-chevron--left" onClick={handlePrev}>
+        <ChevronLeft size={40} />
+      </button>
+
       <div
         className="wisdom-quote"
         onTouchStart={handleTouchStart}
@@ -77,6 +81,14 @@ function WisdomDoc() {
         <p className="translation">{card.body}</p>
       </div>
 
+      <button className="hero-chevron hero-chevron--right" onClick={handleNext}>
+        <ChevronRight size={40} />
+      </button>
+
+      <button className="hero-refresh" onClick={handleMore}>
+        <RefreshCw size={20} />
+      </button>
+
       <div className="hero-dots">
         {cards.map((_, i) => (
           <span
@@ -84,19 +96,6 @@ function WisdomDoc() {
             className={`hero-dot ${i === activeType ? "active" : ""}`}
           />
         ))}
-      </div>
-
-      <div className="hero-controls">
-        <button className="nav-btn" onClick={handlePrev}>
-          <Arrows.ArrowLeft />
-        </button>
-
-        <button className="nav-btn" onClick={handleMore}>
-          <Arrows.ArrowDown />
-        </button>
-        <button className="nav-btn" onClick={handleNext}>
-          <Arrows.ArrowRight />
-        </button>
       </div>
     </section>
   );

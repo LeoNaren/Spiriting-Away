@@ -1,0 +1,60 @@
+.recently-asked-header {
+  font-family: "Inter", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.recent-card {
+  padding: 0.25rem 0 0.5rem 1rem;
+  border-left: 2px solid var(--accent);
+  border-bottom: 1px solid var(--border);
+}
+
+.recent-card:last-child {
+  border-bottom: none;
+}
+
+.recent-card-title {
+  font-family: "Playfair Display", serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.45;
+  margin-bottom: 0.35rem;
+
+  /* clamp to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.recent-card-meta {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.recent-card-actions {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+.recent-card-actions > :first-child {
+  flex: 1;
+}
+
+.recent-card-actions .interaction-icon {
+  transform: scale(0.85);
+}
+
+.recent-card-actions .appreciate-count span,
+.recent-card-actions .response-trigger {
+  font-size: 0.8rem;
+}

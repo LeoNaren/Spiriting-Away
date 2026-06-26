@@ -3,22 +3,23 @@ import "@/styles/askQuestions.css";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 
-function AskQuestion({onSuccess}) {
+function AskQuestion({ onSuccess }) {
   const { user, getToken } = useAuth();
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isSticky, setSticky] = useState(false);
-  const askRef = useRef(null);
+  const sentinelRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setSticky(!entry.isIntersecting);
+        const isAbove = entry.boundingClientRect.top < 0;
+        setSticky(!entry.isIntersecting && isAbove);
       },
-      { threshold: [0] },
+      { threshold: [0.3] },
     );
-    if (askRef.current) observer.observe(askRef.current);
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -62,27 +63,33 @@ function AskQuestion({onSuccess}) {
   };
 
   return (
-    <section className={`ask-container ${isSticky ? "sticky" : ""}`}>
-      <form className="ask-form">
-        <input
-          className="ask-input"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Ask a question..."
-          disabled={isSubmitting}
-        />
-        <div className="ask-actions">
-          <button
-            type="submit"
-            className="submit-button"
-            disabled={isSubmitting || !content.trim()}
-            onClick={handleSubmit} // Need to update so that it refereshes the right feed to show the new question
-          >
-            {isSubmitting ? "Posting..." : "Submit"}
-          </button>
-        </div>
-      </form>
-    </section>
+    <>
+      <div ref={sentinelRef} style={{ height: "1px", visibility: "hidden" }} />
+      <section className={`ask-container ${isSticky ? "ask-scrolled" : ""}`}>
+        <form className="ask-form">
+          <input
+            className="ask-input"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Introspection is the Answer"
+            disabled={isSubmitting}
+          />
+          <div className="ask-actions">
+            <button
+              type="submit"
+              className={`submit-button ${isSticky ? "submit-button--scrolled" : ""}`}
+              disabled={isSubmitting || !content.trim()}
+              onClick={handleSubmit}
+            >
+              <span className="submit-text">
+                {isSubmitting ? "Posting..." : "Ask"}
+              </span>
+              <span className="submit-icon">↑</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </>
   );
 }
 

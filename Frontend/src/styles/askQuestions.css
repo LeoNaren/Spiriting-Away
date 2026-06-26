@@ -1,115 +1,119 @@
 .ask-container {
-  margin: 2rem 0;
-
-  padding: 1.25rem 1.5rem;
-
-  background: var(--surface);
-
+  position: sticky;
+  top: var(--navbar-height);
+  z-index: 1000;
+  background: var(--bg); /* Must have solid background */
+  
+  margin: 1rem 0;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transition: 
+    width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    margin 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    padding 0.2s ease;
+.ask-container.ask-scrolled {
+  width: 95%;                  /* narrows in */
+  margin: 0 auto 1rem;         /* keeps it centered as it narrows */
+  border-radius: 999px;        /* pill shape */
+  box-shadow: var(--shadow-lg);
+}
+
+.ask-container.ask-scrolled .ask-input {
+  min-height: 3.125em;
+  max-height: 3.125em;
+}
+
+/* stop now */
+.ask-scrolled > .ask-form {
+  border-radius: 999px;
+}
+
+.ask-form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  
+  padding: 0.4rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ask-form:focus-within {
+  border-color: var(--accent);
 }
 
 .ask-container:hover {
   box-shadow: var(--shadow);
 }
 
-.ask-heading {
-  font-family: "Playfair Display", serif;
-
-  font-family: "Playfair Display", serif;
-
-  font-size: 1.35rem;
-
-  margin-bottom: 0.75rem;
-}
-
 .ask-input {
-  width: 100%;
-
-  min-height: 72px;
-  max-height: 96px;
-
-  padding: 1rem;
-
-  border: 1px solid var(--border);
-  border-radius: 12px;
-
-  background: var(--bg);
-
-  resize: none;
-
-  font-size: 1rem;
-
+  flex-grow: 1;
+  min-height: 70px; /* Slightly shorter since the form handles padding now */
+  transition: min-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  padding: 0.5rem 1rem;
+  
+  border: none;
+  background: transparent;
   outline: none;
-
-  transition: border-color 0.2s ease;
-}
-
-.ask-input:focus {
-  border-color: var(--accent);
+  
+  font-size: 1rem;
 }
 
 .ask-actions {
-  display: flex;
-  justify-content: flex-end;
-
-  margin-top: 0.75rem;
+  margin: 0; /* Removed the top margin */
 }
 
-.ask-btn {
+.submit-button {
   padding: 0.65rem 1.25rem;
-
   border-radius: 10px;
-
   border: none;
-
   background: #1f1f1f;
   color: white;
+  transition:
+    border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.ask-btn:hover {
-  transform: translateY(-1px);
+.submit-text {
+  transition: opacity 0.3s ease;
+  opacity: 1;
 }
 
-.ask-container.sticky {
-  position: sticky;
-
-  top: 72px;
-
-  z-index: 90;
-
-  padding: 0.75rem;
-
-  margin: 0 0 1rem;
-
-  border-radius: 12px;
-
-  box-shadow: var(--shadow);
+.submit-icon {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.ask-container.sticky .ask-heading,
-.ask-container.sticky .ask-subheading {
-  display: none;
-}
-
-.ask-container.sticky .ask-form {
+.submit-button {
+  position: relative;
   display: flex;
-
   align-items: center;
-
-  gap: 0.75rem;
+  justify-content: center;
 }
 
-.ask-container.sticky .ask-input {
-  min-height: 44px;
-  max-height: 44px;
+.submit-button--scrolled {
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  aspect-ratio: 1; /* makes it a circle */
+  max-height: 3.125em; /* keeps it a circle */
 }
 
-.ask-container.sticky .ask-actions {
-  margin: 0;
+.submit-button--scrolled .submit-text {
+  opacity: 0;
+}
+
+.submit-button--scrolled .submit-icon {
+  opacity: 1;
 }

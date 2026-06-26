@@ -2,10 +2,72 @@
 import "@/styles/reactions.css";
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext.jsx";
 import { AppreciateIcon, RespondIcon } from "./icons.jsx";
+import { Bookmark } from "lucide-react";
 
-// RESPOND BUTTON FUNCTION
+// FOLLOW BUTTON COMPONENT
+function FollowButton({ post_id }) {
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: followData, isPending: isLoadingStatus } = useQuery({
+    queryKey: ["post", post_id, "following"],
+    queryFn: async () => {
+      const token = await getToken();
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post_id}/follow_status`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (!res.ok) throw new Error("Failed to fetch follow status");
+      return res.json();
+    },
+  });
+
+  const toggleFollow = useMutation({
+    mutationFn: async () => {
+      const token = await getToken();
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post_id}/follow`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (!res.ok) throw new Error("Failed to toggle follow");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post", post_id] });
+    },
+  });
+
+  const following = followData?.following || false;
+
+  return (
+    <div className="follow-button">
+      {/* 4. CONDITIONALLY RENDER THE ICON */}
+      <Bookmark
+        className={`follow-btn ${following ? "active" : ""}`}
+        size={16}
+        onClick={() => toggleFollow.mutate()}
+        style={{
+          opacity: toggleFollow.isPending || isLoadingStatus ? 0.5 : 1,
+          cursor: "pointer",
+          color: "var(--primary-color)", // Optional: Highlight when active
+        }}
+      />
+    </div>
+  );
+}
+
+// REACTION BUTTONS COMPONENT
 function ReactionButtons({ post_id = null, response_id = null }) {
   const [hidden, setHidden] = useState(true);
   const [content, setContent] = useState("");
@@ -23,17 +85,18 @@ function ReactionButtons({ post_id = null, response_id = null }) {
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey });
 
-  //GET APPRECIATES
+  // GET APPRECIATES
   const getAppreciate = useQuery({
-    queryKey,
+    queryKey: [...queryKey, "appreciate"], // Slightly modified to avoid queryKey collisions
     queryFn: async () => {
+      const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/${target}/appreciate`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${await getToken()}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       );
@@ -42,7 +105,7 @@ function ReactionButtons({ post_id = null, response_id = null }) {
     },
   });
 
-  // RESPONSE BUTTON FUNCTION
+  // RESPOND BUTTON MUTATION
   const respondClick = useMutation({
     mutationFn: async (content) => {
       if (content.trim() === "") {
@@ -64,10 +127,14 @@ function ReactionButtons({ post_id = null, response_id = null }) {
       if (!response.ok) throw new Error("Failed to submit response");
       return response.json();
     },
-    onSuccess: invalidate,
+    onSuccess: () => {
+      setContent(""); // Clear input on success
+      setHidden(true); // Hide form on success
+      invalidate();
+    },
   });
 
-  // APPRECIATE BUTTON FUNCTION
+  // APPRECIATE BUTTON MUTATION
   const appreciateClick = useMutation({
     mutationFn: async () => {
       const token = await getToken();
@@ -86,12 +153,8 @@ function ReactionButtons({ post_id = null, response_id = null }) {
     onSuccess: invalidate,
   });
 
-  // SHARE FUNCTION GOES HERE
-
-  // SAVE FUNCTION GOES HERE
-
   return (
-    <>
+    <div className="reaction-wrapper">
       <div className="InteractionButtons">
         <div className="interaction-left">
           <div className="appreciate-count">
@@ -100,14 +163,18 @@ function ReactionButtons({ post_id = null, response_id = null }) {
               disabled={appreciateClick.isPending}
               className="interaction-icon"
             >
-              <AppreciateIcon />
+              <AppreciateIcon
+                className={`reaction-btn ${getAppreciate.data?.appreciated ? "active" : ""}`}
+              />
             </button>
-
             <span>{getAppreciate.data?.count || 0}</span>
           </div>
 
-          <button className="interaction-icon" onClick={() => setHidden(false)}>
-            <RespondIcon />
+          <button
+            className="interaction-icon"
+            onClick={() => setHidden(!hidden)}
+          >
+            <RespondIcon className="reaction-btn" />
           </button>
         </div>
       </div>
@@ -130,7 +197,7 @@ function ReactionButtons({ post_id = null, response_id = null }) {
           <div className="response-actions">
             <button
               type="submit"
-              disabled={respondClick.isPending}
+              disabled={respondClick.isPending || !content.trim()}
               className="btn-primary"
             >
               {respondClick.isPending ? "Submitting..." : "Respond"}
@@ -139,14 +206,19 @@ function ReactionButtons({ post_id = null, response_id = null }) {
             <button
               type="button"
               className="btn-outline"
-              onClick={() => setHidden(true)}
+              onClick={() => {
+                setHidden(true);
+                setContent("");
+              }}
             >
               Cancel
             </button>
           </div>
         </form>
       )}
-    </>
+    </div>
   );
 }
+
 export default ReactionButtons;
+export { FollowButton };

@@ -9,6 +9,7 @@
 ========================= */
 
 .feed-card {
+  display: flex;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -16,6 +17,16 @@
   transition:
     transform 0.2s ease,
     border-color 0.2s ease;
+  margin: 0.25rem 0;
+}
+
+.avatar-side {
+  margin-right: 0.37rem;
+}
+
+.data-side {
+  flex: 1;
+  margin-left: 0.37rem;
 }
 
 .feed-card:hover {
@@ -67,7 +78,7 @@
     "Lora",
     serif;
 
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 500;
   line-height: 1.35;
   color: var(--text);
@@ -83,12 +94,13 @@
 .question-meta {
   margin: 0;
 
-  font-size: 0.92rem;
+  font-size: 0.62rem;
   color: var(--muted);
 }
 
 .question-actions {
-  margin-top: 0.35rem;
+  margin-top: 0.05rem;
+  margin-bottom: 0.2rem;
 }
 
 /* =========================
@@ -96,17 +108,15 @@
 ========================= */
 
 .card-divider {
-  margin-top: 1.4rem;
-  padding-top: 1.2rem;
+  /* margin-top: 1.4rem; */
+  padding-top: 0.25rem;
   border-top: 1px solid var(--border);
 }
 
 .top-reflection {
   display: inline-block;
 
-  margin-bottom: 0.9rem;
-
-  font-size: 0.82rem;
+  font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -115,13 +125,11 @@
 }
 
 .reflection-content {
-  margin: 0;
-
   font-family:
     "Lora",
     serif;
 
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1.8;
   color: var(--text);
 }
@@ -134,9 +142,9 @@
   font-style: italic;
 }
 
-.reflection-actions {
-  margin-top: 1rem;
-}
+/* .reflection-actions {
+  margin-top: 0.25rem;
+} */
 
 /* =========================
    REACTION BUTTON AREA
@@ -147,6 +155,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+.question-actions > :first-child {
+  flex: 1;
 }
 
 /* Works nicely regardless of how

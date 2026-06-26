@@ -1,12 +1,13 @@
 "use client";
 import "@/styles/layout.css";
-import React, { useState } from "react";
+import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import WisdomDoc from "../components/HeroStack";
 import AskQuestion from "../components/Question";
 import Feed from "../components/Feed_new";
 import RecentlyAsked from "../components/RecentlyAsked";
+import Activity from "../components/Activity";
 
 function Home() {
   const queryClient = useQueryClient();
@@ -14,18 +15,21 @@ function Home() {
   return (
     <>
       <div className="page-body">
+        <div className="left-column">
+          <Activity />
+        </div>
         <div className="main-column">
           <section className="wisdom-container">
             <WisdomDoc />
           </section>
-          
-          <section className="ask-container">
-            <AskQuestion onSuccess={() =>
+
+          <AskQuestion
+            onSuccess={() =>
               queryClient.invalidateQueries({
                 queryKey: ["posts"],
               })
-            } />
-          </section>
+            }
+          />
 
           <section className="feed-container">
             <Feed />

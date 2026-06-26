@@ -23,7 +23,7 @@ function Navbar() {
 
         <div className="nav-links">
           <Link className="nav-link" href="/">
-            Questions
+            Explore
           </Link>
         </div>
 

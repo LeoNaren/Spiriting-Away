@@ -20,6 +20,24 @@
     0 8px 24px rgba(0,0,0,0.04);
 
   --content-width: 1280px;
+
+  --navbar-height: 90px;
+}
+
+.reaction-btn {
+  transition: fill 0.2s ease;
+}
+
+.reaction-btn.active {
+  fill: currentColor; /* This makes it "solid" using the text color */
+}
+
+.follow-btn {
+  transition: fill 0.2s ease;
+}
+
+.follow-btn.active {
+  fill: currentColor; /* This makes it "solid" using the text color */
 }
 
 * {
