@@ -94,4 +94,22 @@
 
 .hamburger {
   display: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 101; /* Ensure hamburger stays clickable over menu */
+}
+
+.mobile-menu {
+  position: absolute;
+  top: 72px;
+  right: 0;
+  width: 100%;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 2rem;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+  z-index: 99;
 }
