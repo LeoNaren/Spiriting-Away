@@ -7,11 +7,13 @@ import { signOut } from "firebase/auth";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Menu, X } from "lucide-react";
 
 function Navbar() {
   const { user } = useAuth();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="navbar">
       <div className="navbar-container">
@@ -45,20 +47,31 @@ function Navbar() {
           )}
         </div>
 
-        <button
-          className={`hamburger ${menuOpen ? "active" : ""}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+        {isOpen ? (
+          <X
+            size={20}
+            className="hamburger"
+            onClick={() => {
+              setMenuOpen(false);
+              setIsOpen(false);
+            }}
+          />
+        ) : (
+          <Menu
+            size={20}
+            className="hamburger"
+            onClick={() => {
+              setMenuOpen(true);
+              setIsOpen(true);
+            }}
+          />
+        )}
       </div>
 
       {menuOpen && (
         <div className="mobile-menu">
           {user ? (
-            <>
+            <div className="hamburger-links">
               <span className="nav-username">
                 {user.displayName || user.email}
               </span>
@@ -72,7 +85,7 @@ function Navbar() {
               >
                 Sign out
               </span>
-            </>
+            </div>
           ) : (
             <Link href="/auth" onClick={() => setMenuOpen(false)}>
               Sign In

@@ -67,3 +67,13 @@ export const ArrowUp = () => (
     <path d="m5 12 7-7 7 7" />
   </svg>
 );
+
+export const hamburger = () => (
+  <button class="menu-toggle" aria-label="Toggle menu">
+  <svg viewBox="0 0 100 80" width="30" height="30" fill="currentColor">
+    <rect width="100" height="12" rx="6"></rect>
+    <rect y="30" width="100" height="12" rx="6"></rect>
+    <rect y="60" width="100" height="12" rx="6"></rect>
+  </svg>
+</button>
+)

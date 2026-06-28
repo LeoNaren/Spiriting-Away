@@ -4,6 +4,6 @@ Frontend = Nextjs deployed on vercel
 Backend = Fastapi deployed on Google Cloud run
 Database = PostgreSQL deployed on Neon
 
-CURRENT PROGRESS
-Frontend is okay now. Haven't added respond button to a response.
-Work on Backend.
+CURRENT Tasks
+Add an observer on the Feed-container to load the next 20 feed-cards once scrolled to the end.
+Make the Question forum's submit button invalidate activity's cache.

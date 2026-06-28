@@ -117,3 +117,21 @@
 .submit-button--scrolled .submit-icon {
   opacity: 1;
 }
+
+@media (max-width: 480px) {
+  .ask-container {
+    width: 100%;
+  }
+
+  .submit-button {
+    display: none;
+  }
+
+  .ask-form {
+    width: 100%;
+  }
+
+  .ask-container {
+    z-index: 100;
+  }
+}

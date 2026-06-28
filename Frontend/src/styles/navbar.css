@@ -85,13 +85,27 @@
   color: var(--accent);
 }
 
-.hamburger span {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: var(--text-primary);
-}
-
 .hamburger {
   display: none;
+}
+
+@media (max-width: 480px) {
+  .nav-links, .site-title, .nav-user {
+    display: none;
+  }
+
+  .hamburger {
+    display: block;
+    cursor: pointer;
+  }
+
+  .hamburger-links {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hamburger-links > * {
+    margin-left: auto;
+    padding-right: 1rem;
+  }
 }
