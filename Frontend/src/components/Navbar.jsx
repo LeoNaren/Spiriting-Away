@@ -87,9 +87,11 @@ function Navbar() {
               </span>
             </div>
           ) : (
-            <Link href="/auth" onClick={() => setMenuOpen(false)}>
-              Sign In
-            </Link>
+            <div className="hamburger-links">
+              <Link href="/auth" onClick={() => setMenuOpen(false)}>
+                Sign In
+              </Link>
+            </div>
           )}
         </div>
       )}

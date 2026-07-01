@@ -16,6 +16,11 @@
   cursor: pointer;
 }
 
+.question-actions > :last-child,
+.recent-card-actions > :last-child {
+  align-self: flex-start;
+}
+
 .InteractionButtons {
   display: flex;
   align-items: center;

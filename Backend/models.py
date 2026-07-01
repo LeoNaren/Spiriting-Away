@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, CheckConstraint, Index, BigInteger
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, CheckConstraint, Index, BigInteger, PrimaryKeyConstraint
 from sqlalchemy.sql.expression import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -17,6 +17,7 @@ class User(Base):
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
     responses = relationship("Response", back_populates="author", cascade="all, delete-orphan")
     appreciates = relationship("Appreciates", back_populates="user", cascade="all, delete-orphan")
+    post_follows = relationship("PostFollow", back_populates="user", cascade="all, delete-orphan")
 
 class Post(Base):
     __tablename__ = "posts"
@@ -29,6 +30,7 @@ class Post(Base):
     author = relationship("User", back_populates="posts")
     responses = relationship("Response", back_populates="post", cascade="all, delete-orphan")
     appreciates = relationship("Appreciates", back_populates="post", cascade="all, delete-orphan")
+    post_follows = relationship("PostFollow", back_populates="post", cascade="all, delete-orphan")
 
 class Response(Base):
     __tablename__ = "responses"
@@ -73,3 +75,18 @@ class Appreciates(Base):
     user = relationship("User", back_populates="appreciates")
     post = relationship("Post", back_populates="appreciates")
     response = relationship("Response", back_populates="appreciates")
+
+class PostFollow(Base):
+    __tablename__ = "post_follows"
+
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    post_id = Column(BigInteger, ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="post_follows")
+    post = relationship("Post", back_populates="post_follows")
+
+    __table_args__ = (
+        PrimaryKeyConstraint("user_id", "post_id"),
+        Index("idx_users_flw_post", "post_id"),
+    )

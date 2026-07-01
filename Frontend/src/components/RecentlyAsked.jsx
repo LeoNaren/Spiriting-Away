@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 async function fetchPosts() {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts?sort=new&skip=0&limit=7`
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/feed-posts?sort=new&skip=0&limit=7`
   );
   if (!res.ok) throw new Error("Failed to fetch posts");
   return res.json();

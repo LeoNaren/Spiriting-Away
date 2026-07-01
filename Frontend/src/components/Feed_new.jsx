@@ -1,11 +1,14 @@
 "use client";
 import "@/styles/feed.css";
 import ReactionButtons, { FollowButton } from "./Reactions";
-import { useState, useEffect } from "react";
-import { formatDistanceToNow } from "date-fns";
-import {UserProf} from "./icons.jsx";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { formatDistanceToNow, set } from "date-fns";
+import { UserProf } from "./icons.jsx";
+import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 function FeedCard({ post }) {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [responses, setResponses] = useState([]);
 
@@ -17,11 +20,16 @@ function FeedCard({ post }) {
       .catch((err) => console.error("Error fetching user:", err));
 
     // Fetch responses
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post.id}/responses`)
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post.id}/${3}/responses`)
       .then((res) => res.json())
       .then((data) => setResponses(data))
       .catch((err) => console.error("Error fetching responses:", err));
   }, [post.id, post.user_id]);
+
+  const queryClient = useQueryClient();
+  queryClient.setQueryData(["post", post.id], post);
+  queryClient.setQueryData(["user", post.user_id], user);
+
 
   if (!user) return <div>Loading...</div>;
 
@@ -35,7 +43,9 @@ function FeedCard({ post }) {
 
       <div className="data-side">
         <div className="question-content">
-          <h3 className="question-title">{post.content}</h3>
+          <h3 className="question-title" onClick={() => router.push(`/discussion/${post.id}`)}>
+            {post.content}
+          </h3>
 
           <p className="question-meta">
             Asked by {user.name} •{" "}
@@ -64,30 +74,94 @@ function FeedCard({ post }) {
     </div>
   );
 }
+  const LIMIT =10;
+  
 
 export default function Feed() {
+  const [sort, setSort] = useState("trending");
   const [posts, setPosts] = useState([]);
+  const [skip, setSkip] = useState(0);
+  const hasMoreRef = useRef(true);
+  const [hasMore, setHasMore] = useState(true);
+  const sentinelRef = useRef(null);
+  const isFetchingRef = useRef(false);
+  const requestIdRef = useRef(0);
+
+  const loadPosts = useCallback(async (skip) => {
+    if (isFetchingRef.current || !hasMoreRef.current) return;
+    isFetchingRef.current = true;
+    const currentRequestId = ++requestIdRef.current;
+    console.log('Sort:', sort)
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/feed-posts?skip=${skip}&limit=${LIMIT}&sort=${sort}`,
+      );
+      const data = await response.json();
+
+      if (currentRequestId !== requestIdRef.current) return;
+
+      setPosts((prev) => [...prev, ...data]);
+      if (data.length < LIMIT) {
+        hasMoreRef.current = false;
+        setHasMore(false);
+      }
+
+      setSkip((prev) => prev + data.length);
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+    } finally {
+      isFetchingRef.current = false;
+    }
+  }, [sort]);
+
+  const handleSortChange = (newSort) => {
+    if (newSort === sort) return;
+    requestIdRef.current++;
+    setSort(newSort);
+    console.log('Sort changed to:', newSort);
+    setPosts([]);
+    setSkip(0);
+    hasMoreRef.current = true;
+    setHasMore(true);
+    isFetchingRef.current = false;
+  }
 
   useEffect(() => {
-    async function loadPosts() {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts?sort=new&skip=0&limit=20`,
-        );
-        const data = await res.json();
-        setPosts(data);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    }
-    loadPosts();
-  }, []);
+    const timeoutId = setTimeout(() => {
+      loadPosts(0);
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [loadPosts]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadPosts(skip);
+      },
+      { threshold: 0.3 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [skip, loadPosts]);
 
   return (
     <div>
+      <div className="sort-btns">
+        <button className={`sort-btn ${sort === "trending" ? "active" : ""}`} onClick={() => handleSortChange("trending")}>
+          Trending
+        </button>
+        <button className={`sort-btn ${sort === "new" ? "active" : ""}`} onClick={() => handleSortChange("new")}>
+          New
+        </button>
+      </div>
       {posts.map((post) => (
         <FeedCard key={post.id} post={post} />
       ))}
+      <div className="sentinel"ref={sentinelRef}>{hasMore ? "Loading more posts..." : "End of feed"}</div>
     </div>
   );
 }

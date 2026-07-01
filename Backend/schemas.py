@@ -1,8 +1,8 @@
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 from datetime import datetime
 from typing import Optional
 
-class UserResponse(BaseModel):
+class User(BaseModel):
     uid: str
     name: Optional[str] = None
     username: str
@@ -61,3 +61,27 @@ class AppriciateOut(BaseModel):
 class AppreciateStatus(BaseModel):
     appreciated: bool
     count: int
+
+class FollowStatus(BaseModel):
+    following: bool
+
+class Posts(BaseModel):
+    id: int
+    user_id: int
+    content: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class ActivityOut(BaseModel):
+    posts: list[Posts]
+
+class PostOut(BaseModel):
+    id: int
+    user_id: int
+    content: str
+    created_at: datetime
+    author: User
+
+    model_config = ConfigDict(from_attributes=True)

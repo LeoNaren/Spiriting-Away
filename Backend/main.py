@@ -3,15 +3,20 @@ import json
 from fastapi import FastAPI, Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func, select
 import firebase_admin
 from firebase_admin import auth, credentials
 from fastapi.middleware.cors import CORSMiddleware
 import string
 import secrets
-
 import models
 import schemas
-from database import get_db
+from database import get_db, engine
+import models
+from datetime import timedelta, timezone, datetime
+from typing import Optional
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Spiriting Away Backend")
 
@@ -61,42 +66,71 @@ def get_user(user_id, db: Session = Depends(get_db)):
         )
     return user
 
-@app.get("/posts")
-def get_posts(
-    sort: str = "new",
-    skip:int = 0,
-    limit: int = 20,
-    db: Session = Depends(get_db)):
-    posts = db.query(models.Post).order_by(models.Post.created_at.desc()).offset(skip).limit(limit).all()
-    # Sorting Algorithm based on the 'sort' parameter
-    return posts
-
-@app.post("/posts")
-def create_post(post: schemas.CreatePost, db: Session = Depends(get_db),
-                decoded_token: dict = Depends(verify_firebase_token)):
-    uid = decoded_token["uid"]
-    user = db.query(models.User).filter(models.User.uid == uid).first()
-
-    if not user:
+@app.get("/post/{id}", response_model=list[schemas.PostOut])
+def get_post(id: int, db: Session = Depends(get_db)):
+    post = db.query(models.Post).filter(models.Post.id == id).first()
+    if not post:
         raise HTTPException(
             status_code=404,
-            detail="User not found."
+            detail="Post not found."
         )
-    new_post = models.Post(
-        user_id= db.query(models.User.id).filter(models.User.uid == uid).scalar(),
-        content=post.content
-    )
-    db.add(new_post)
-    db.commit()
-    db.refresh(new_post)
-    return new_post
+    return post
+
+@app.get("/feed-posts", response_model=list[schemas.PostOut])
+def get_posts(
+    sort: str = "trending",
+    skip: int = 0,
+    limit: int = 20,
+    db: Session = Depends(get_db)):
+    
+    week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    if(sort == "new"):
+        posts = (
+            db.query(models.Post)
+            .options(joinedload(models.Post.author))
+            .order_by(models.Post.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+    else:
+        trend_score = (
+        func.count(models.Appreciates.user_id.distinct()) +
+        func.count(models.PostFollow.user_id.distinct()) +
+        func.count(models.Response.id.distinct())
+        ).label("trend_score")
+        print(f"Trend score query: {trend_score}")
+
+        trending_subq = (
+            db.query(
+                models.Post.id.label("post_id"),
+                trend_score
+            )
+            .outerjoin(models.Appreciates, (models.Appreciates.post_id == models.Post.id) & (models.Appreciates.created_at >= week_ago))
+            .outerjoin(models.PostFollow, (models.PostFollow.post_id == models.Post.id) & (models.PostFollow.created_at >= week_ago))
+            .outerjoin(models.Response, (models.Response.post_id == models.Post.id) & (models.Response.created_at >= week_ago))
+            .group_by(models.Post.id)
+            .subquery()
+        )
+        print(f"Trending subquery: {trending_subq}")
+
+        posts = (
+            db.query(models.Post)
+            .options(joinedload(models.Post.author))
+            .join(trending_subq, trending_subq.c.post_id == models.Post.id)
+            .order_by(trending_subq.c.trend_score.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+    return posts
 
 def generate_suffix(length: int = 6) -> str:
     alphabet = string.ascii_letters + string.digits
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
-@app.post("/user/auth", response_model=schemas.UserResponse)
-def authentical_or_register_user(
+@app.post("/user/auth", response_model=schemas.User)
+def authenticate_or_register_user(
     decoded_token: dict = Depends(verify_firebase_token),
     db: Session = Depends(get_db)
     ):
@@ -147,8 +181,8 @@ def authentical_or_register_user(
     
     return user
 
-@app.get("/posts/{post_id}/responses", response_model=list[schemas.ResponseOut])
-def get_responses(post_id: int, db: Session = Depends(get_db)):
+@app.get("/posts/{post_id}/{limit}/responses", response_model=list[schemas.ResponseOut])
+def get_responses(post_id: int, limit: Optional[int] = None, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
 
     if not post:
@@ -157,9 +191,30 @@ def get_responses(post_id: int, db: Session = Depends(get_db)):
             detail="Post not found."
         )
     
-    responses = (
-        db.query(models.Response).options(joinedload(models.Response.author)).filter(models.Response.post_id == post_id).all()
+    appreciate_count = func.count(models.Appreciates.user_id.distinct()).label("appreciate_count")
+
+    counts_subq = (
+        db.query(
+            models.Response.id.label("response_id"),
+            appreciate_count
+        )
+        .outerjoin(models.Appreciates, models.Appreciates.response_id == models.Response.id)
+        .filter(models.Response.post_id == post_id)
+        .group_by(models.Response.id)
+        .subquery()
     )
+
+    res = (
+        db.query(models.Response)
+        .options(joinedload(models.Response.author))
+        .join(counts_subq, counts_subq.c.response_id == models.Response.id)
+        .order_by(counts_subq.c.appreciate_count.desc(), models.Response.created_at.desc())
+    )
+
+    if limit is not None:
+        responses = res.limit(limit).all()
+    else:
+        responses = res.all()
     return responses
 
 @app.post("/responses/{response_id}/responses", response_model=schemas.ResponseOut, status_code=201)
@@ -313,7 +368,85 @@ def appreciate_response(id: int, db: Session = Depends(get_db),
     if not user:
         raise HTTPException(
             status_code=404,
-            detail="User not found. Please login first."
+            detail="User not found."
         )
     
     return toggle_appreciate(db, user.id, response_id=id)
+
+@app.post("/posts/{id}/follow", response_model=schemas.FollowStatus, status_code=201)
+def follow_post(id: int, db: Session = Depends(get_db),
+                decoded_token: dict = Depends(verify_firebase_token)):
+    uid = decoded_token["uid"]
+    user = db.query(models.User).filter(models.User.uid == uid).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found."
+        )
+    
+    existing_follow = db.query(models.PostFollow).filter(
+        models.PostFollow.post_id == id,
+        models.PostFollow.user_id == user.id
+    ).first()
+
+    if existing_follow:
+        following = False
+        db.query(models.PostFollow).filter(
+            models.PostFollow.post_id == id,
+            models.PostFollow.user_id == user.id
+        ).delete(synchronize_session=False)
+        db.commit()
+    else:
+        following = True
+        new_follow = models.PostFollow(
+            post_id=id,
+            user_id=user.id
+        )
+        db.add(new_follow)
+        db.commit()
+
+    return {"following": following}
+
+@app.get("/posts/{id}/follow_status", response_model=schemas.FollowStatus)
+def get_post_follow_status(id: int, db: Session = Depends(get_db), decoded_token: dict = Depends(verify_firebase_token)):
+    user_id = db.query(models.User.id).filter(models.User.uid == decoded_token["uid"]).scalar()
+    
+    following = db.query(models.PostFollow).filter(
+        models.PostFollow.post_id == id,
+        models.PostFollow.user_id == user_id
+    ).first() is not None
+    return {"following": following}
+
+@app.get("/activity", response_model=schemas.ActivityOut)
+def get_activity_feed(limit: int = 5, db: Session = Depends(get_db), decoded_token: dict = Depends(verify_firebase_token)):
+    user_id = db.query(models.User.id).filter(models.User.uid == decoded_token["uid"]).scalar()
+
+    posted = (select(models.Post.id.label("post_id"), models.Post.created_at).where(models.Post.user_id == user_id).order_by(models.Post.created_at.desc()).limit(limit))
+    responded = (select(models.Response.post_id.label("post_id"), models.Response.created_at).where(models.Response.user_id == user_id).order_by(models.Response.created_at.desc()).limit(limit))
+    followed = (select(models.PostFollow.post_id.label("post_id"), models.PostFollow.created_at).where(models.PostFollow.user_id == user_id).order_by(models.PostFollow.created_at.desc()).limit(limit))
+
+    p = db.execute(posted)
+    r = db.execute(responded)
+    f = db.execute(followed)
+
+    postsList = {}
+
+    for post_id, created_at in p.all() + r.all() + f.all():
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+        if post_id not in postsList or created_at > postsList[post_id]:
+            postsList[post_id] = created_at
+
+    sorted_posts = sorted(postsList.items(), key=lambda x: x[1], reverse=True)[:limit]
+    post_ids = [post_id for post_id, _ in sorted_posts]
+
+    if not post_ids:
+        return schemas.ActivityOut(posts=[])
+
+    posts = select(models.Post).where(models.Post.id.in_(post_ids)).limit(limit)
+    result = db.execute(posts).scalars().all()
+
+    res = {post.id: post for post in result}
+    ordered_posts = [res[pid] for pid in post_ids if pid in res]
+    return schemas.ActivityOut(posts=ordered_posts)
