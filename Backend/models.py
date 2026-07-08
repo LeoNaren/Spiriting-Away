@@ -52,9 +52,10 @@ class Response(Base):
 class Appreciates(Base):
     __tablename__ = "appreciates"
 
-    post_id = Column(BigInteger, ForeignKey("posts.id", ondelete="CASCADE"), nullable=True, index=True, primary_key=True)
-    response_id = Column(BigInteger, ForeignKey("responses.id", ondelete="CASCADE"), nullable=True, index=True, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True, primary_key=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    post_id = Column(BigInteger, ForeignKey("posts.id", ondelete="CASCADE"), nullable=True, index=True)
+    response_id = Column(BigInteger, ForeignKey("responses.id", ondelete="CASCADE"), nullable=True, index=True)
+    user_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     __table_args__ = (

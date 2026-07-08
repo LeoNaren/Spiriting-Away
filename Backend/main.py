@@ -40,24 +40,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def verify_firebase_token(authorization: str = Header(...)):
+def get_optional_firebase_token(authorization: str | None = Header(default=None)):
+    if not authorization:
+        return None
     try:
-        if not authorization.startswith("Bearer "):
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid authorization header"
-            )
-        token = authorization.split(" ")[1]
-        decoded_token = auth.verify_id_token(token)
-        return decoded_token
-    except Exception:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid Firebase token."
-        )
+        parts = authorization.split(None, 1)
+        if len(parts) != 2 or parts[0].lower() != "bearer":
+            return None
+        token = parts[1]
+        if isinstance(token, str) and token.strip().lower() in ("null", "none", "undefined", ""):
+            return None
+        return auth.verify_id_token(token)
+    except Exception as e:
+        print("Firebase token verification error:", repr(e))
+        return None
 
-@app.get("/user")
-def get_user(user_id, db: Session = Depends(get_db)):
+def verify_firebase_token(decoded_token: dict | None = Depends(get_optional_firebase_token)):
+    if decoded_token is None:
+        raise HTTPException(status_code=401, detail="Invalid Firebase token.")
+    return decoded_token
+
+@app.get("/user", response_model=schemas.User)
+def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(
@@ -66,7 +70,7 @@ def get_user(user_id, db: Session = Depends(get_db)):
         )
     return user
 
-@app.get("/post/{id}", response_model=list[schemas.PostOut])
+@app.get("/post/{id}", response_model=schemas.PostOut)
 def get_post(id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post:
@@ -99,7 +103,6 @@ def get_posts(
         func.count(models.PostFollow.user_id.distinct()) +
         func.count(models.Response.id.distinct())
         ).label("trend_score")
-        print(f"Trend score query: {trend_score}")
 
         trending_subq = (
             db.query(
@@ -112,7 +115,6 @@ def get_posts(
             .group_by(models.Post.id)
             .subquery()
         )
-        print(f"Trending subquery: {trending_subq}")
 
         posts = (
             db.query(models.Post)
@@ -239,6 +241,7 @@ def create_response_to_response(response_id: int, response: schemas.ResponseCrea
     new_response = models.Response(
         post_id=parent_response.post_id,
         user_id=user.id,
+        parent_response_id=response_id,
         content=response.content
     )
     db.add(new_response)
@@ -322,10 +325,12 @@ def toggle_appreciate(db, user_id, *, post_id=None, response_id=None):
 
 
 @app.get("/posts/{id}/appreciate", response_model=schemas.AppreciateStatus)
-def get_post_appreciate_status(id: int, db: Session = Depends(get_db), decoded_token: dict = Depends(verify_firebase_token)):
+def get_post_appreciate_status(id: int, db: Session = Depends(get_db), decoded_token: dict | None = Depends(get_optional_firebase_token)):
     count = db.query(models.Appreciates).filter(models.Appreciates.post_id == id).count()
+    if decoded_token is None:
+        return {"appreciated": False, "count": count}
+
     user_id = db.query(models.User.id).filter(models.User.uid == decoded_token["uid"]).scalar()
-    
     appreciated = db.query(models.Appreciates).filter(
         models.Appreciates.post_id == id,
         models.Appreciates.user_id == user_id
@@ -333,9 +338,13 @@ def get_post_appreciate_status(id: int, db: Session = Depends(get_db), decoded_t
     return {"appreciated": appreciated, "count": count}
 
 @app.get("/responses/{id}/appreciate", response_model=schemas.AppreciateStatus)
-def get_response_appreciate_status(id: int, db: Session = Depends(get_db), decoded_token: dict = Depends(verify_firebase_token)):
+def get_response_appreciate_status(id: int, db: Session = Depends(get_db), decoded_token: dict | None = Depends(get_optional_firebase_token)):
     
     count = db.query(models.Appreciates).filter(models.Appreciates.response_id == id).count()
+
+    if decoded_token is None:
+        return {"appreciated": False, "count": count}
+
     user_id = db.query(models.User.id).filter(models.User.uid == decoded_token["uid"]).scalar()
     
     appreciated = db.query(models.Appreciates).filter(
@@ -409,7 +418,10 @@ def follow_post(id: int, db: Session = Depends(get_db),
     return {"following": following}
 
 @app.get("/posts/{id}/follow_status", response_model=schemas.FollowStatus)
-def get_post_follow_status(id: int, db: Session = Depends(get_db), decoded_token: dict = Depends(verify_firebase_token)):
+def get_post_follow_status(id: int, db: Session = Depends(get_db), decoded_token: dict | None = Depends(get_optional_firebase_token)):
+    if decoded_token is  None:
+        return {"following": False}
+
     user_id = db.query(models.User.id).filter(models.User.uid == decoded_token["uid"]).scalar()
     
     following = db.query(models.PostFollow).filter(

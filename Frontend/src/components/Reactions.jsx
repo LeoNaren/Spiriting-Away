@@ -8,19 +8,18 @@ import { Bookmark } from "lucide-react";
 
 // FOLLOW BUTTON COMPONENT
 function FollowButton({ post_id }) {
-  const { getToken } = useAuth();
+  const { isLoading, user, getToken } = useAuth();
   const queryClient = useQueryClient();
+  const authScope = user?.uid ?? "anon";
 
   const { data: followData, isPending: isLoadingStatus } = useQuery({
-    queryKey: ["post", post_id, "following"],
+    queryKey: ["post", post_id, "following", authScope],
     queryFn: async () => {
       const token = await getToken();
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/posts/${post_id}/follow_status`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         },
       );
       if (!res.ok) throw new Error("Failed to fetch follow status");
@@ -52,7 +51,7 @@ function FollowButton({ post_id }) {
 
   return (
     <div className="follow-button">
-      {/* 4. CONDITIONALLY RENDER THE ICON */}
+
       <Bookmark
         className={`follow-btn ${following ? "active" : ""}`}
         size={16}
@@ -71,7 +70,7 @@ function FollowButton({ post_id }) {
 function ReactionButtons({ post_id = null, response_id = null }) {
   const [hidden, setHidden] = useState(true);
   const [content, setContent] = useState("");
-  const { getToken } = useAuth();
+  const { isLoading, getToken, user } = useAuth();
 
   if (!!post_id === !!response_id) {
     throw new Error("Exactly one of post_id or response_id must be provided");
@@ -80,6 +79,8 @@ function ReactionButtons({ post_id = null, response_id = null }) {
   const queryClient = useQueryClient();
   const target =
     post_id !== null ? `posts/${post_id}` : `responses/${response_id}`;
+  const authScope = user?.uid ?? "anon";
+
   const queryKey =
     post_id !== null ? ["post", post_id] : ["response", response_id];
 
@@ -87,7 +88,7 @@ function ReactionButtons({ post_id = null, response_id = null }) {
 
   // GET APPRECIATES
   const getAppreciate = useQuery({
-    queryKey: [...queryKey, "appreciate"], // Slightly modified to avoid queryKey collisions
+    queryKey: [...queryKey, "appreciate", authScope],
     queryFn: async () => {
       const token = await getToken();
       const res = await fetch(
@@ -96,7 +97,7 @@ function ReactionButtons({ post_id = null, response_id = null }) {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
         },
       );
@@ -111,8 +112,8 @@ function ReactionButtons({ post_id = null, response_id = null }) {
       if (content.trim() === "") {
         throw new Error("Response content cannot be empty");
       }
-
       const token = await getToken();
+      if (!token) throw new Error("User not authenticated");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/${target}/responses`,
         {
@@ -138,6 +139,7 @@ function ReactionButtons({ post_id = null, response_id = null }) {
   const appreciateClick = useMutation({
     mutationFn: async () => {
       const token = await getToken();
+      if (!token) throw new Error("User not authenticated");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/${target}/appreciate`,
         {
@@ -159,8 +161,11 @@ function ReactionButtons({ post_id = null, response_id = null }) {
         <div className="interaction-left">
           <div className="appreciate-count">
             <button
-              onClick={() => appreciateClick.mutate()}
-              disabled={appreciateClick.isPending}
+              onClick={() => {
+                if (!user || isLoading) return;
+                appreciateClick.mutate();
+              }}
+              disabled={appreciateClick.isPending || isLoading || !user}
               className="interaction-icon"
             >
               <AppreciateIcon

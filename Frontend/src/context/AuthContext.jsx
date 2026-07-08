@@ -3,24 +3,47 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { auth } from "@/data/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { useCallback, useMemo } from "react";
 
 const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => setUser(currentUser));
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            (currentUser) => {
+                setUser(currentUser);
+                setIsLoading(false);
+            },
+            (err) => {
+                setError(err);
+                setIsLoading(false);
+            }
+        );
         return () => unsubscribe();
     }, [])
 
-    const getToken = async () => {
+    const getToken = useCallback(async () => {
         if (!user) return null;
-        return await user.getIdToken();
-    };
+        try {
+            return await user.getIdToken();
+        } catch (err) {
+            setError(err);
+            return null;
+        }
+    }, [user]);
+
+    const value = useMemo(
+        () => ({ user, getToken, isLoading, error, isAuthenticated: !!user }),
+        [user, isLoading, error, getToken]
+    );
 
     return (
-        <AuthContext.Provider value={{user, getToken}}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

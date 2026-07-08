@@ -91,7 +91,6 @@ export default function Feed() {
     if (isFetchingRef.current || !hasMoreRef.current) return;
     isFetchingRef.current = true;
     const currentRequestId = ++requestIdRef.current;
-    console.log('Sort:', sort)
 
     try {
       const response = await fetch(
