@@ -1,0 +1,260 @@
+/* ==========================================================================
+   Discussion Page — master-detail layout
+   Uses existing tokens: --bg (#faf8f4), --accent (#c9a24a)
+   Fonts: Playfair Display (headings) + Inter (body)
+   ========================================================================== */
+
+:root {
+  --accent-light: #e8dcc0;
+  --text: #2a2620;
+  --text-muted: #7a7266;
+  --border: #e5e0d5;
+  --card-bg: #ffffff;
+  --card-bg-hover: #fdfcf9;
+}
+
+/* ---------- Title section ---------- */
+
+.title-container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+.title {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.meta-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.question-meta {
+  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.question-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Hide the Respond button only when it's inside the centered title header */
+.title-container .reaction-wrapper .interaction-left > button.interaction-icon:last-of-type {
+  display: none;
+}
+
+.discussion-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  align-items: start;
+}
+
+/* ---------- Left column: response list ---------- */
+
+.left-column {
+  padding-right: 3rem;
+  height: calc(100vh - 200px); /* adjust 200px to match your navbar + title height */
+  overflow-y: auto;
+  position: sticky;
+  top: 2rem;
+  scrollbar-width: none;
+}
+
+.left-column::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.left-column.is-scrolling {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.left-column.is-scrolling::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.left-column.is-scrolling::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.responses-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.response-card {
+  font-family: "Inter", sans-serif;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.response-card:hover {
+  background: var(--card-bg-hover);
+  border-color: var(--accent-light);
+}
+
+/* Wire this up in JS when a card is clicked — see note below */
+.response-card.selected {
+  border-color: var(--accent);
+  background: var(--card-bg-hover);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.response-content {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.response-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.response-meta p {
+  margin: 0;
+}
+
+.left-column.is-scrolling::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+/* ---------- Right column: expanded view ---------- */
+
+.right-column {
+  border-left: 1px solid var(--border);
+  padding-left: 3rem;
+  min-height: 200px;
+  position: sticky;
+  top: 2rem;
+}
+
+.right-column .response-full {
+  font-family: "Inter", sans-serif;
+}
+
+.response-full .response-meta {
+  /* flex-direction: column; */
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.response-full hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1rem 0;
+}
+
+.response-full p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+/* Empty state before any card is selected */
+.right-column:empty::before,
+.response-full:empty::before {
+  content: "Select a response to read it in full.";
+  color: var(--text-muted);
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+}
+
+/* ---------- Input box (question-level, centered below both columns) ----------
+   Not yet present in the JSX — add when the "add a response" form is built.
+   Reference styling below.
+------------------------------------------------------------ */
+
+.discussion-input-box {
+  max-width: 700px;
+  margin: 3rem auto 4rem;
+  padding: 0 1.5rem;
+}
+
+.discussion-input-box textarea {
+  width: 100%;
+  min-height: 100px;
+  font-family: "Inter", sans-serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  resize: vertical;
+}
+
+.discussion-input-box textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ---------- End-of-list sentinel ---------- */
+
+.left-column + div,
+[ref="sentinelRef"] {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 2rem 0;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 768px) {
+  .discussion-body {
+    grid-template-columns: 1fr;
+  }
+
+  .left-column {
+    padding-right: 0;
+  }
+
+  .right-column {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+    margin-top: 1rem;
+    position: static;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}

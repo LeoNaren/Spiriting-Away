@@ -183,8 +183,8 @@ def authenticate_or_register_user(
     
     return user
 
-@app.get("/posts/{post_id}/{limit}/responses", response_model=list[schemas.ResponseOut])
-def get_responses(post_id: int, limit: Optional[int] = None, db: Session = Depends(get_db)):
+@app.get("/posts/{post_id}/responses", response_model=list[schemas.ResponseOut])
+def get_responses(post_id: int, skip: Optional[int] = None, limit: Optional[int] = None, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
 
     if not post:
@@ -212,6 +212,9 @@ def get_responses(post_id: int, limit: Optional[int] = None, db: Session = Depen
         .join(counts_subq, counts_subq.c.response_id == models.Response.id)
         .order_by(counts_subq.c.appreciate_count.desc(), models.Response.created_at.desc())
     )
+
+    if skip is not None:
+        res = res.offset(skip)
 
     if limit is not None:
         responses = res.limit(limit).all()

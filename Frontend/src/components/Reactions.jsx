@@ -8,7 +8,7 @@ import { Bookmark } from "lucide-react";
 
 // FOLLOW BUTTON COMPONENT
 function FollowButton({ post_id }) {
-  const { isLoading, user, getToken } = useAuth();
+  const { user, getToken } = useAuth();
   const queryClient = useQueryClient();
   const authScope = user?.uid ?? "anon";
 
